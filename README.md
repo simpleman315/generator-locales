@@ -4,11 +4,17 @@ This is the README for your extension "generator-locales". After writing up a br
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+国际化文件生成插件，右键文件夹-》生成国际化，生成规则如下：
 
-For example if there is an image subfolder under your extension project workspace:
+1、会遍历当前文件夹下所有文件并查找所有中文字符并写入当前文件下的locales/zh-CN.ts文件下
 
-\!\[feature X\]\(images/feature-x.png\)
+2、如果当前文件夹的子文件夹已经包含了locales目录，则该子文件夹不做处理
+
+3、对如下目录的文件不处理："locales","images","assets","services","models","img",".umi"
+
+4、自动生成的文件zh-CN.ts点击注释可以跳转到对应的文件目录
+
+5、点击页面中的'menu.demo.xxx'可以跳转到国际化资源配置文件对应的位置(目前只支持跳转到zh-CN文件)
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
