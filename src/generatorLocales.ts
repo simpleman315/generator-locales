@@ -87,7 +87,7 @@ async function translate(allZhCNs: string[]): Promise<any> {
     allZhCNs.map(async (item) => {
       let enItem = global.encodeURIComponent(item);
       return await request(
-        "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=" + enItem
+        `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`
       );
     })
   );
