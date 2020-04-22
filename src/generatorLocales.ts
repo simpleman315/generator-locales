@@ -46,6 +46,7 @@ function writeLocalesByData(
       data.push(`    '${key}': '${value}',`);
     }
   }
+
   // 设置还未配置的国际化资源
   if (allZhCNs && allZhCNs.length > 0) {
     let noRepeatAllZhCNs = [...new Set(allZhCNs)];
@@ -54,6 +55,11 @@ function writeLocalesByData(
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
+        let matches = allZhCNPositions[indexItem].split(" ");
+        if (matches && matches.length === 5) {
+          // 通过genKey将源文件中的中文替换成国际化标签
+          fileUtils.replaceZhbyGenkey(matches[1], item, genKey);
+        }
       });
       data.push(`    '${genKey}': '${item}',`);
     });
