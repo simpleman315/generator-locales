@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import * as request from "request";
+import * as request from "request-promise";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
 import CONSTANTS from "./constants";
@@ -17,6 +17,7 @@ import CONSTANTS from "./constants";
 function writeLocalesByData(
   dir: string,
   allZhCNs: string[],
+  transENByallZhCNs: string[],
   allZhCNPositions: string[],
   allFormatMessages: string[],
   allFormatMessagePositions: string[],
@@ -47,12 +48,12 @@ function writeLocalesByData(
   // 设置还未配置的国际化资源
   if (allZhCNs && allZhCNs.length > 0) {
     let noRepeatAllZhCNs = [...new Set(allZhCNs)];
-    noRepeatAllZhCNs.map((item) => {
+    noRepeatAllZhCNs.map((item, index) => {
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
       });
-      data.push(`    '${CONSTANTS.genKey}': '${item}',`);
+      data.push(`    '${transENByallZhCNs[index]}': '${item}',`);
     });
   }
 
@@ -80,20 +81,20 @@ function writeLocalesByData(
 }
 
 async function translate(allZhCNs: string[]): Promise<any> {
-  allZhCNs.map((item) => {
-    let enItem = global.encodeURIComponent(item);
-    request(
-      "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=" + enItem,
-      (err: any, response: any, body: any) => {
-        if (!err && response.statusCode === 200) {
-          let res = JSON.parse(body);
-          console.error(res);
-        }
-      }
-    );
-  });
-
-  return Promise.resolve(allZhCNs);
+  let translateAllZhCNs: string[] = [];
+  await Promise.all(
+    allZhCNs.map(async (item) => {
+      let enItem = global.encodeURIComponent(item);
+      const response = await request(
+        "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=" + enItem
+      );
+      let res = JSON.parse(response);
+      let translateWords = res.translateResult[0][0].tgt;
+      let hump = utils.wordsToHump(translateWords);
+      translateAllZhCNs.push(hump);
+    })
+  );
+  return Promise.resolve(translateAllZhCNs);
 }
 
 const generatorLocales = {
@@ -115,7 +116,7 @@ const generatorLocales = {
     }
     let currIndex = 0;
     files.map((item: string) => {
-      fileUtils.readFileChineseToArr(item, function (
+      fileUtils.readFileChineseToArr(item, async function (
         arr: string[],
         matchFileLine: string[],
         formatMessageArr: string[],
@@ -135,10 +136,11 @@ const generatorLocales = {
         currIndex++;
 
         if (currIndex === files.length) {
-          translate(allZhCNs);
+          const transENByallZhCNs = await translate(allZhCNs);
           writeLocalesByData(
             dir,
             allZhCNs,
+            transENByallZhCNs,
             allZhCNPositions,
             allFormatMessages,
             allFormatMessagePositions,

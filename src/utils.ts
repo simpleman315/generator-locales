@@ -70,7 +70,11 @@ const utils = {
         }
       }
     }
-    return arr.join("");
+    let result = arr.join("");
+    if (result) {
+      result = result.replace(result[0], result[0].toLowerCase());
+    }
+    return result;
   },
 };
 export default utils;
