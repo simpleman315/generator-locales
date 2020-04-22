@@ -15,6 +15,7 @@ import CONSTANTS from "./constants";
  * @param {*} isExistLocalesMap 已经存在的国际化资源
  */
 function writeLocalesByData(
+  fileName: string,
   dir: string,
   allZhCNs: string[],
   transENByallZhCNs: string[],
@@ -53,7 +54,7 @@ function writeLocalesByData(
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
       });
-      data.push(`    '${transENByallZhCNs[index]}': '${item}',`);
+      data.push(`    '${fileName}.${transENByallZhCNs[index]}': '${item}',`);
     });
   }
 
@@ -103,6 +104,7 @@ const generatorLocales = {
    * @param {*} dir 需要生成国际化的文件目录
    */
   generatorLocalesByDir(dir: string) {
+    const fileName = utils.matchFileNameByDir(dir);
     fileUtils.createLocalesDirAndFile(dir);
     const isExistLocalesMap = fileUtils.convertLocalesFileToMap(dir);
     let allZhCNs: string[] = [];
@@ -138,6 +140,7 @@ const generatorLocales = {
         if (currIndex === files.length) {
           const transENByallZhCNs = await translate(allZhCNs);
           writeLocalesByData(
+            fileName,
             dir,
             allZhCNs,
             transENByallZhCNs,

@@ -72,9 +72,35 @@ const utils = {
     }
     let result = arr.join("");
     if (result) {
-      result = result.replace(result[0], result[0].toLowerCase());
+      result = utils.toLowerCaseFirstCap(result);
     }
     return result;
+  },
+  /**
+   * 首字母转小写
+   * @param str
+   */
+  toLowerCaseFirstCap(str: string) {
+    if (str) {
+      let result = str.replace(str[0], str[0].toLowerCase());
+      return result;
+    }
+    return str;
+  },
+  /**
+   * 通过目录路径获取文件名称，不包含扩展名
+   * @param dir 目录路径
+   */
+  matchFileNameByDir: function (path: string) {
+    let result = "";
+    var pos1 = path.lastIndexOf("/");
+    var pos2 = path.lastIndexOf("\\");
+    var pos = Math.max(pos1, pos2);
+    if (pos < 0) {
+      return path;
+    }
+    result = path.substring(pos + 1);
+    return utils.toLowerCaseFirstCap(result);
   },
 };
 export default utils;
