@@ -83,18 +83,20 @@ function writeLocalesByData(
 
 async function translate(allZhCNs: string[]): Promise<any> {
   let translateAllZhCNs: string[] = [];
-  await Promise.all(
+  const results = await Promise.all(
     allZhCNs.map(async (item) => {
       let enItem = global.encodeURIComponent(item);
-      const response = await request(
+      return await request(
         "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=" + enItem
       );
-      let res = JSON.parse(response);
-      let translateWords = res.translateResult[0][0].tgt;
-      let hump = utils.wordsToHump(translateWords);
-      translateAllZhCNs.push(hump);
     })
   );
+  translateAllZhCNs = results.map((item) => {
+    let res = JSON.parse(item);
+    let translateWords = res.translateResult[0][0].tgt;
+    let hump = utils.wordsToHump(translateWords);
+    return hump;
+  });
   return Promise.resolve(translateAllZhCNs);
 }
 
