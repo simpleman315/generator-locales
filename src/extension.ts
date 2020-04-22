@@ -1,7 +1,7 @@
 import commands from "./commands";
 import * as vscode from "vscode";
 import jumpToDefinition from "./jumpToDefinition";
-const hoverProvider = require("./hoverProvider");
+import hoverProvider from "./hoverProvider";
 /**
  * @param {*} context
  */
