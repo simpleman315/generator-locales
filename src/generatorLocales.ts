@@ -50,11 +50,12 @@ function writeLocalesByData(
   if (allZhCNs && allZhCNs.length > 0) {
     let noRepeatAllZhCNs = [...new Set(allZhCNs)];
     noRepeatAllZhCNs.map((item, index) => {
+      let genKey = `${fileName}.${transENByallZhCNs[index]}`;
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
       });
-      data.push(`    '${fileName}.${transENByallZhCNs[index]}': '${item}',`);
+      data.push(`    '${genKey}': '${item}',`);
     });
   }
 
