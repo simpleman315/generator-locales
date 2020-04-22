@@ -5,21 +5,21 @@
 	"publisher": "simpleman315",
 	"description": "generator-locales",
 	"author": {
-	  "name": "simple_man_315"
+		"name": "simple_man_315"
 	},
 	"categories": [
-	  "Other"
+		"Other"
 	],
 	"icon": "images/icon.png",
 	"galleryBanner": {
-	  "color": "#C80000",
-	  "theme": "dark"
+		"color": "#C80000",
+		"theme": "dark"
 	},
 	"activationEvents": [
-	  "*"
+		"*"
 	],
 	"engines": {
-	  "vscode": "^1.43.0"
+		"vscode": "^1.43.0"
 	},
 	"main": "./out/extension.js",
 	"scripts": {
@@ -31,29 +31,29 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"contributes": {
-	  "commands": [
-		{
-		  "command": "generator.locales",
-		  "title": "生成国际化"
+		"commands": [
+			{
+				"command": "generator.locales",
+				"title": "生成国际化"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "generator.locales",
+					"group": "navigation"
+				}
+			]
 		}
-	  ],
-	  "menus": {
-		"explorer/context": [
-		  {
-			"command": "generator.locales",
-			"group": "navigation"
-		  }
-		]
-	  }
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.44.0",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
-		"@types/node": "^13.11.0",
-		"eslint": "^6.8.0",
-		"@typescript-eslint/parser": "^2.26.0",
+		"@types/node": "^13.13.2",
+		"@types/vscode": "^1.44.0",
 		"@typescript-eslint/eslint-plugin": "^2.26.0",
+		"@typescript-eslint/parser": "^2.26.0",
+		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
 		"mocha": "^7.1.1",
 		"typescript": "^3.8.3",
@@ -61,11 +61,11 @@
 	},
 	"license": "SEE LICENSE IN LICENSE.txt",
 	"bugs": {
-	  "url": "https://github.com/simpleman315/vv-generator-locales/issues"
+		"url": "https://github.com/simpleman315/vv-generator-locales/issues"
 	},
 	"repository": {
-	  "type": "git",
-	  "url": "https://github.com/simpleman315/vv-generator-locales"
+		"type": "git",
+		"url": "https://github.com/simpleman315/vv-generator-locales"
 	},
 	"homepage": "https://github.com/simpleman315/vv-generator-locales/blob/master/README.md"
-  }
+}

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-module.exports = function (context: vscode.ExtensionContext) {
+export default function (context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerHoverProvider(
       { pattern: "**/zh-CN.ts" },

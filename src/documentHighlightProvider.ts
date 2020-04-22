@@ -10,7 +10,7 @@ function provideDocumentHighlights() {
   return res;
 }
 
-module.exports = function (context: vscode.ExtensionContext) {
+export default function (context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerDocumentHighlightProvider(
       { pattern: "**/zh-CN.ts" },
