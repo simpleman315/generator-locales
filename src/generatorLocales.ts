@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import * as request from "request";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
 import CONSTANTS from "./constants";
@@ -21,6 +22,7 @@ function writeLocalesByData(
   allFormatMessagePositions: string[],
   isExistLocalesMap: Map<string, string>
 ) {
+  // request('dddd');
   let data = [];
   data.push("export default {");
   // 获取已经配置过，但是页面未使用或者是路由类型的key
@@ -77,6 +79,23 @@ function writeLocalesByData(
   vscode.window.showInformationMessage("国际化文件生成成功！");
 }
 
+async function translate(allZhCNs: string[]): Promise<any> {
+  allZhCNs.map((item) => {
+    let enItem = global.encodeURIComponent(item);
+    request(
+      "http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=" + enItem,
+      (err: any, response: any, body: any) => {
+        if (!err && response.statusCode === 200) {
+          let res = JSON.parse(body);
+          console.error(res);
+        }
+      }
+    );
+  });
+
+  return Promise.resolve(allZhCNs);
+}
+
 const generatorLocales = {
   /**
    *
@@ -115,7 +134,8 @@ const generatorLocales = {
         }
         currIndex++;
 
-        if (currIndex + 1 === files.length) {
+        if (currIndex === files.length) {
+          translate(allZhCNs);
           writeLocalesByData(
             dir,
             allZhCNs,

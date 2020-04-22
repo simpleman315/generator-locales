@@ -54,5 +54,23 @@ const utils = {
       new vscode.Position(pos.row, pos.col + str.length)
     );
   },
+  /**
+   * 空格隔开的单词转成驼峰
+   * @param words 空格分隔的单词
+   */
+  wordsToHump: function (words: string) {
+    var arr = words.split(" ");
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === "") {
+        arr.splice(i, 1);
+        i--;
+      } else {
+        if (i >= 1) {
+          arr[i] = arr[i].substring(0, 1).toUpperCase() + arr[i].substring(1);
+        }
+      }
+    }
+    return arr.join("");
+  },
 };
 export default utils;
