@@ -180,6 +180,60 @@ const fileUtils = {
   },
   /**
    *
+   * @param includesZhCNFiles 包含中文的文件
+   * @param allZhCNs 所有匹配的中文
+   * @param transENByallZhCNs 所有中文对应的英文
+   * @param keyName 国际化key头部唯一名称
+   */
+  writeFormateMessageToFile(
+    includesZhCNFiles: string[],
+    allZhCNs: string[],
+    transENByallZhCNs: string[],
+    keyName: string
+  ) {
+    if (
+      includesZhCNFiles &&
+      includesZhCNFiles.length > 0 &&
+      allZhCNs &&
+      allZhCNs.length > 0
+    ) {
+      includesZhCNFiles.map((item) => {
+        fileUtils.replaceChZhToFormatmessage(
+          {
+            filePath: item,
+            allZhCNs,
+            transENByallZhCNs,
+            keyName,
+          },
+          (fileData: string) => {
+            console.error(fileData);
+          }
+        );
+      });
+    }
+  },
+  /**
+   * 返回将中文替换成国际化标签后的文本
+   * @param filePath 文件目录
+   * @param callback 回调函数
+   */
+  replaceChZhToFormatmessage(options: any, callback: any) {
+    let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
+    let data = fs.readFileSync(filePath, "utf-8");
+    // 正则替换文件中的中文为国际化表达式
+    allZhCNs.map((item: string) => {
+      // TODO 正则待完成
+      // 匹配类似页面中console.error(’国际化xxx‘)的中文，正则表达式字符串需要双转义
+      let matchRegStr1 = `(\\()(\\')([^\\(]*)(${item})([^\\)]*)(\\')(\\))`;
+      let matchReg1 = new RegExp(matchRegStr1,'g');
+      // 匹配类似页面中console.error(`国际化${msgType}`)的中文
+      let matchRegStr2 = `(\\()(\`)([^\\(]*)(${item})([^\\)]*)(\`)(\\))`;
+
+    });
+    callback(data);
+  },
+  /**
+   *
    * @param {*} dir
    */
   createLocalesDirAndFile(dir: string) {

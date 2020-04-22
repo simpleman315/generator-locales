@@ -55,11 +55,11 @@ function writeLocalesByData(
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
-        let matches = allZhCNPositions[indexItem].split(" ");
-        if (matches && matches.length === 5) {
-          // 通过genKey将源文件中的中文替换成国际化标签
-          fileUtils.replaceZhbyGenkey(matches[1], item, genKey);
-        }
+        // let matches = allZhCNPositions[indexItem].split(" ");
+        // if (matches && matches.length === 5) {
+        //   // 通过genKey将源文件中的中文替换成国际化标签
+        //   fileUtils.replaceZhbyGenkey(matches[1], item, genKey);
+        // }
       });
       data.push(`    '${genKey}': '${item}',`);
     });
@@ -99,10 +99,14 @@ async function translate(allZhCNs: string[]): Promise<any> {
     })
   );
   translateAllZhCNs = results.map((item) => {
-    let res = JSON.parse(item);
-    let translateWords = res.translateResult[0][0].tgt;
-    let hump = utils.wordsToHump(translateWords);
-    return hump;
+    try {
+      let res = JSON.parse(item);
+      let translateWords = res.translateResult[0][0].tgt;
+      let hump = utils.wordsToHump(translateWords);
+      return hump;
+    } catch (error) {
+      return new Date().getTime() + "";
+    }
   });
   return Promise.resolve(translateAllZhCNs);
 }
@@ -120,6 +124,7 @@ const generatorLocales = {
     let allZhCNPositions: string[] = [];
     let allFormatMessages: string[] = [];
     let allFormatMessagePositions: string[] = [];
+    let includesZhCNFiles: string[] = [];
     const files = fileUtils.getFilesByDir(dir);
     if (files.length === 0) {
       vscode.window.showInformationMessage("国际化文件生成成功！");
@@ -134,6 +139,7 @@ const generatorLocales = {
         formatMessageMatchFileLine: string[]
       ) {
         if (arr && arr.length > 0) {
+          includesZhCNFiles.push(item);
           allZhCNs = allZhCNs.concat(arr);
           allZhCNPositions = allZhCNPositions.concat(matchFileLine);
         }
@@ -148,6 +154,8 @@ const generatorLocales = {
 
         if (currIndex === files.length) {
           const transENByallZhCNs = await translate(allZhCNs);
+          // 将包含中文的文件替换成国际化标签，此处异步操作完成
+          fileUtils.writeFormateMessageToFile(includesZhCNFiles,allZhCNs,transENByallZhCNs,fileName);
           writeLocalesByData(
             fileName,
             dir,
