@@ -88,21 +88,23 @@ const fileUtils = {
    * */
   readFileChineseToArr(filePath: string, callback: any) {
     let data = fs.readFileSync(filePath, "utf-8");
-    // 替换单行注释
-    data = data.replace(commentReg, "\ncomment\n");
-    // 替换多行注释
-    data = data.replace(mulCommentReg, (...args) => {
-      const mulLine = args[0].split("\n");
-      const results = mulLine.map((item) => {
-        return "comment";
-      });
-      return results.join("\n");
-    });
     // 替换行尾注释
-    data = data.replace(tailCommentReg, "");
-    // 替换控制台输入表达式
-    data = data.replace(matchConsoleReg, "");
+    data = data.replace(tailCommentReg, (...args)=>{
+      return args[0].replace(chinaReg,'');
+    });
+    // 替换单行注释
+    data = data.replace(commentReg, (...args)=>{
+      return args[0].replace(chinaReg,'');
+    });
+    // 替换多行注释
+    data = data.replace(mulCommentReg, (...args)=>{
+      return args[0].replace(chinaReg,'');
+    });
 
+    // 替换控制台输入表达式
+    data = data.replace(matchConsoleReg, (...args)=>{
+      return args[0].replace(chinaReg,'');
+    });
     const readable = Readable.from(data);
     // let fRead = fs.createReadStream(filePath);
     let objReadline = readline.createInterface({
@@ -286,7 +288,7 @@ const fileUtils = {
       let matchRegStr4 = `(${item})`;
       const matchReg4 = new RegExp(matchRegStr4, "g");
       data = data.replace(matchReg4, (...args: any) => {
-        return `{formatMessage({ id: ${guid}${key}${guid}})}`;
+        return `{formatMessage({ id: ${guid}${key}${guid} })}`;
       });
     });
     let guidReg = new RegExp(guid, "g");
