@@ -90,18 +90,33 @@ function writeLocalesByData(
 
 async function translate(allZhCNs: string[]): Promise<any> {
   let translateAllZhCNs: string[] = [];
+  const options = {
+    url: "",
+    headers: {
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+      "Cache-Control": "max-age=0",
+      Connection: "keep-alive",
+      Cookie:
+        'OUTFOX_SEARCH_USER_ID_NCOO=703353445.1243408; OUTFOX_SEARCH_USER_ID="-964541302@10.169.0.83"; _ga=GA1.2.277377119.1584954051; UM_distinctid=171a48fe2414a1-090d8aef44032a-b363e65-1fa400-171a48fe2427f3',
+      Host: "fanyi.youdao.com",
+      "Upgrade-Insecure-Requests": 1,
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
+    },
+    json: true, // Automatically parses the JSON string in the response
+  };
   const results = await Promise.all(
     allZhCNs.map(async (item) => {
       let enItem = global.encodeURIComponent(item);
-      return await request(
-        `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`
-      );
+      options.url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`;
+      return await request(options);
     })
   );
   translateAllZhCNs = results.map((item) => {
     try {
-      let res = JSON.parse(item);
-      let translateWords = res.translateResult[0][0].tgt;
+      let translateWords = item.translateResult[0][0].tgt;
       let hump = utils.wordsToHump(translateWords);
       return hump;
     } catch (error) {
@@ -155,7 +170,12 @@ const generatorLocales = {
         if (currIndex === files.length) {
           const transENByallZhCNs = await translate(allZhCNs);
           // 将包含中文的文件替换成国际化标签，此处异步操作完成
-          fileUtils.writeFormateMessageToFile(includesZhCNFiles,allZhCNs,transENByallZhCNs,fileName);
+          fileUtils.writeFormateMessageToFile(
+            includesZhCNFiles,
+            allZhCNs,
+            transENByallZhCNs,
+            fileName
+          );
           writeLocalesByData(
             fileName,
             dir,

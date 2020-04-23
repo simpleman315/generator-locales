@@ -198,17 +198,12 @@ const fileUtils = {
       allZhCNs.length > 0
     ) {
       includesZhCNFiles.map((item) => {
-        fileUtils.replaceChZhToFormatmessage(
-          {
-            filePath: item,
-            allZhCNs,
-            transENByallZhCNs,
-            keyName,
-          },
-          (fileData: string) => {
-            console.error(fileData);
-          }
-        );
+        fileUtils.replaceChZhToFormatmessage({
+          filePath: item,
+          allZhCNs,
+          transENByallZhCNs,
+          keyName,
+        });
       });
     }
   },
@@ -217,7 +212,7 @@ const fileUtils = {
    * @param filePath 文件目录
    * @param callback 回调函数
    */
-  replaceChZhToFormatmessage(options: any, callback: any) {
+  replaceChZhToFormatmessage(options: any) {
     let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
     let data = fs.readFileSync(filePath, "utf-8");
     // 正则替换文件中的中文为国际化表达式
@@ -257,7 +252,6 @@ const fileUtils = {
       });
     });
     fs.writeFileSync(filePath, data);
-    callback(data);
   },
   /**
    *
