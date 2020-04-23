@@ -4,8 +4,8 @@ import fileUtils from "./fileUtils";
 import utils from "./utils";
 
 // 国际化标识正则
-const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.]*)['|"][\s]*\}\)/g;
-const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.]*)['|"][\s\S]*>/g;
+const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.%]*)['|"][\s]*\}\)/g;
+const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.%]*)['|"][\s\S]*>/g;
 /**
  * @param {*} document
  * @param {*} position

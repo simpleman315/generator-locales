@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import * as request from "request-promise";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
+import constants from "./constants";
 
 /**
  *
@@ -23,7 +24,6 @@ function writeLocalesByData(
   allFormatMessagePositions: string[],
   isExistLocalesMap: Map<string, string>
 ) {
-  // request('dddd');
   let data = [];
   data.push("export default {");
   // 获取已经配置过，但是页面未使用或者是路由类型的key
@@ -55,11 +55,6 @@ function writeLocalesByData(
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
         data.push(`    ${allZhCNPositions[indexItem]}`);
-        // let matches = allZhCNPositions[indexItem].split(" ");
-        // if (matches && matches.length === 5) {
-        //   // 通过genKey将源文件中的中文替换成国际化标签
-        //   fileUtils.replaceZhbyGenkey(matches[1], item, genKey);
-        // }
       });
       data.push(`    '${genKey}': '${item}',`);
     });
@@ -111,16 +106,18 @@ async function translate(allZhCNs: string[]): Promise<any> {
     allZhCNs.map(async (item) => {
       let enItem = global.encodeURIComponent(item);
       options.url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`;
-      return await request(options);
+      const result = await request(options);
+      console.error(result);
+      return result;
     })
   );
-  translateAllZhCNs = results.map((item) => {
+  translateAllZhCNs = results.map((item, index) => {
     try {
       let translateWords = item.translateResult[0][0].tgt;
       let hump = utils.wordsToHump(translateWords);
       return hump;
     } catch (error) {
-      return new Date().getTime() + "";
+      return `${constants.translationFailed}${encodeURIComponent(allZhCNs[index])}`;
     }
   });
   return Promise.resolve(translateAllZhCNs);
