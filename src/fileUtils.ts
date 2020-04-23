@@ -226,9 +226,6 @@ const fileUtils = {
       let matchRegStr1 = `(\\')([^\\']*)(${item})([^\\']*)(\\')`;
       const matchReg1 = new RegExp(matchRegStr1, "g");
       data = data.replace(matchReg1, (...args: any) => {
-        if (args[0].indexOf("console.") !== -1) {
-          return args[0];
-        }
         return `\`${args[2]}\${formatMessage({ id: '${key}' })}${args[4]}\``;
       });
       // 匹配类似页面中message.error(`国际化xxx${text}`)的中文
@@ -245,9 +242,7 @@ const fileUtils = {
       // 匹配类似页面中<div>国际化</div>的中文
       let matchRegStr4 = `(${item})`;
       const matchReg4 = new RegExp(matchRegStr4, "g");
-      data = data.replace(matchReg4, (...args: any) => {
-        return `{formatMessage({id: '${key}'})}`;
-      });
+      data = data.replace(matchReg4, `{formatMessage({id: '${key}'})}`);
     });
     fs.writeFileSync(filePath, data);
   },
