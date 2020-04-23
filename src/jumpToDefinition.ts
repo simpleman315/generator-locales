@@ -14,8 +14,9 @@ function provideDefinition(
   document: vscode.TextDocument,
   position: vscode.Position
 ) {
-  // const fileName = document.fileName;
-  // const workDir = path.dirname(fileName);
+  const fileName = document.fileName;
+  const workDir = path.dirname(fileName);
+  const folders = vscode.workspace.workspaceFolders;
   // const word = document.getText(document.getWordRangeAtPosition(position));
   const line = document.lineAt(position);
   let lineTxt = line.text.trim();
