@@ -117,7 +117,9 @@ async function translate(allZhCNs: string[]): Promise<any> {
       let hump = utils.wordsToHump(translateWords);
       return hump;
     } catch (error) {
-      return `${constants.translationFailed}${encodeURIComponent(allZhCNs[index])}`;
+      return `${constants.translationFailed}${encodeURIComponent(
+        allZhCNs[index]
+      )}`;
     }
   });
   return Promise.resolve(translateAllZhCNs);
@@ -128,8 +130,13 @@ const generatorLocales = {
    *
    * @param {*} dir 需要生成国际化的文件目录
    */
-  generatorLocalesByDir(dir: string) {
-    const fileName = utils.matchFileNameByDir(dir);
+  generatorLocalesByDir(dir: string, moduleName: any) {
+    let fileName = "";
+    if (moduleName) {
+      fileName = moduleName.toString();
+    } else {
+      fileName = utils.matchFileNameByDir(dir);
+    }
     fileUtils.createLocalesDirAndFile(dir);
     const isExistLocalesMap = fileUtils.convertLocalesFileToMap(dir);
     let allZhCNs: string[] = [];
