@@ -34,7 +34,7 @@ const utils = {
     if (content.search(regExp) < 0) {
       return { row: 0, col: 0 };
     }
-    const rows = content.split(os.EOL);
+    const rows = content.split('\n');
     // 分行查找只为了拿到行
     for (let i = 0; i < rows.length; i++) {
       let col = rows[i].search(regExp);
