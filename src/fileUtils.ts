@@ -15,7 +15,9 @@ const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.]*)['|"
 const commentReg = /(?:^|\n|\r)\s*\/\/.*(?:\r|\n|$)/g;
 
 // 多行注释
-const mulCommentReg = /^(^\s+)\*[\s\S]*/g;
+const mulCommentReg = /(\/\/.*$)|(\/\*(.|\s)*?\*\/)/g;
+
+// const mulCommentReg = /^(^\s+)\*[\s\S]*/g;
 
 // 行尾注释
 const tailCommentReg = /(?<!\:)\/\/[^\n]*/g;
@@ -222,6 +224,7 @@ const fileUtils = {
     let data = fs.readFileSync(filePath, "utf-8");
     // 占位单引号防止正则匹配错误
     const guid = utils.guid();
+    const qguid = utils.guid();
     // 正则替换文件中的中文为国际化表达式
     allZhCNs.map((item: string, index: number) => {
       let key = `${keyName}.${transENByallZhCNs[index]}`;
@@ -229,7 +232,7 @@ const fileUtils = {
       let matchRegStr1 = `(\\')([^\\']*)(${item})([^\\']*)(\\')`;
       const matchReg1 = new RegExp(matchRegStr1, "g");
       data = data.replace(matchReg1, (...args: any) => {
-        return `\`${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}\``;
+        return `${qguid}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${qguid}`;
       });
       // 匹配类似页面中message.error(`国际化xxx${text}`)的中文
       let matchRegStr2 = `(\`)([^\`]*)(${item})([^\`]*)(\`)`;
@@ -252,8 +255,10 @@ const fileUtils = {
         return `{formatMessage({ id: ${guid}${key}${guid}})}`;
       });
     });
-    let reg = new RegExp(guid, "g");
-    data = data.replace(reg, "'");
+    let guidReg = new RegExp(guid, "g");
+    data = data.replace(guidReg, "'");
+    let qguidReg = new RegExp(qguid, "g");
+    data = data.replace(qguidReg, "`");
     fs.writeFileSync(filePath, data);
   },
   /**
