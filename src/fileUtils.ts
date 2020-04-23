@@ -17,6 +17,9 @@ const commentReg = /(?:^|\n|\r)\s*\/\/.*(?:\r|\n|$)/g;
 // 多行注释
 const mulCommentReg = /(\/\/.*$)|(\/\*(.|\s)*?\*\/)/g;
 
+// 匹配chrome console命令正则
+const matchConsoleReg = /console\..*\(.*\)/g;
+
 // const mulCommentReg = /^(^\s+)\*[\s\S]*/g;
 
 // 行尾注释
@@ -220,25 +223,31 @@ const fileUtils = {
    * @param callback 回调函数
    */
   replaceChZhToFormatmessage(options: any) {
-    const commentMap = new Map();
+    const filterMap = new Map();
     let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
     let data = fs.readFileSync(filePath, "utf-8");
     // 替换单行注释
     data = data.replace(commentReg, (...args) => {
       const id = utils.guid();
-      commentMap.set(id, args[0]);
+      filterMap.set(id, args[0]);
       return id;
     });
     // 替换多行注释
     data = data.replace(mulCommentReg, (...args) => {
       const id = utils.guid();
-      commentMap.set(id, args[0]);
+      filterMap.set(id, args[0]);
       return id;
     });
     // 替换行尾注释
     data = data.replace(tailCommentReg, (...args) => {
       const id = utils.guid();
-      commentMap.set(id, args[0]);
+      filterMap.set(id, args[0]);
+      return id;
+    });
+    // 替换控制台输入表达式
+    data = data.replace(matchConsoleReg, (...args) => {
+      const id = utils.guid();
+      filterMap.set(id, args[0]);
       return id;
     });
     // 占位单引号防止正则匹配错误
@@ -279,7 +288,7 @@ const fileUtils = {
     let qguidReg = new RegExp(qguid, "g");
     data = data.replace(qguidReg, "`");
     // 还原注释
-    for (let [key, value] of commentMap) {
+    for (let [key, value] of filterMap) {
       data = data.replace(key, value);
     }
     fs.writeFileSync(filePath, data);
