@@ -102,5 +102,13 @@ const utils = {
     result = path.substring(pos + 1);
     return utils.toLowerCaseFirstCap(result);
   },
+  /**
+   * 生成唯一ID
+   */
+  guid: function () {
+    return Number(Math.random().toString().substr(3, 3) + Date.now()).toString(
+      36
+    );
+  },
 };
 export default utils;
