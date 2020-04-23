@@ -96,16 +96,20 @@ const fileUtils = {
         if (!(mulComment && mulComment.length > 0)) {
           // 替换行尾注释
           line = line.replace(tailCommentReg, "");
-          let regResult = line.match(chinaReg);
-          if (regResult && regResult.length > 0) {
-            regResult.map((item) => {
-              arr.push(item);
-              const positon = srcLine.indexOf(item);
-              matchFileLine.push(
-                `// ${filePath} lineNum: ${lineNum} ${positon}`
-              );
-            });
+          // 过滤console中的中文
+          if (line && line.indexOf("console.") === -1) {
+            let regResult = line.match(chinaReg);
+            if (regResult && regResult.length > 0) {
+              regResult.map((item) => {
+                arr.push(item);
+                const positon = srcLine.indexOf(item);
+                matchFileLine.push(
+                  `// ${filePath} lineNum: ${lineNum} ${positon}`
+                );
+              });
+            }
           }
+
           let formatMsgs = line.match(formatMessageReg);
           if (formatMsgs && formatMsgs.length > 0) {
             formatMsgs.map((item) => {
@@ -219,22 +223,19 @@ const fileUtils = {
     allZhCNs.map((item: string, index: number) => {
       let key = `${keyName}.${transENByallZhCNs[index]}`;
       // 匹配类似页面中message.error('国际化xxx')的中文
-      let matchRegStr1 = `(.*)(\\')([^\\(]*)(${item})([^\\)]*)(\\')`;
+      let matchRegStr1 = `(\\')([^\\']*)(${item})([^\\']*)(\\')`;
       const matchReg1 = new RegExp(matchRegStr1, "g");
       data = data.replace(matchReg1, (...args: any) => {
         if (args[0].indexOf("console.") !== -1) {
           return args[0];
         }
-        return `${args[1]}\`${args[3]}\${formatMessage({ id: '${key}' })}${args[5]}\``;
+        return `\`${args[2]}\${formatMessage({ id: '${key}' })}${args[4]}\``;
       });
       // 匹配类似页面中message.error(`国际化xxx${text}`)的中文
-      let matchRegStr2 = `(.*)(\`)([^\\(]*)(${item})([^\\)]*)(\`)`;
+      let matchRegStr2 = `(\`)([^\`]*)(${item})([^\`]*)(\`)`;
       const matchReg2 = new RegExp(matchRegStr2, "g");
       data = data.replace(matchReg2, (...args: any) => {
-        if (args[0].indexOf("console.") !== -1) {
-          return args[0];
-        }
-        return `${args[1]}${args[2]}${args[3]}\${formatMessage({ id: '${key}' })}${args[5]}${args[6]}`;
+        return `${args[1]}${args[2]}\${formatMessage({ id: '${key}' })}${args[4]}${args[5]}`;
       });
 
       // 匹配类似页面中<div title="国际化"></div>的中文
@@ -242,13 +243,10 @@ const fileUtils = {
       const matchReg3 = new RegExp(matchRegStr3, "g");
       data = data.replace(matchReg3, `{formatMessage({ id: '${key}' })}`);
       // 匹配类似页面中<div>国际化</div>的中文
-      let matchRegStr4 = `(.*)(${item})`;
+      let matchRegStr4 = `(${item})`;
       const matchReg4 = new RegExp(matchRegStr4, "g");
       data = data.replace(matchReg4, (...args: any) => {
-        if (args[0].indexOf("console.") !== -1) {
-          return args[0];
-        }
-        return `${args[1]}{formatMessage({id: '${key}'})}`;
+        return `{formatMessage({id: '${key}'})}`;
       });
     });
     fs.writeFileSync(filePath, data);
