@@ -89,9 +89,15 @@ const fileUtils = {
   readFileChineseToArr(filePath: string, callback: any) {
     let data = fs.readFileSync(filePath, "utf-8");
     // 替换单行注释
-    data = data.replace(commentReg, "");
+    data = data.replace(commentReg, "\ncomment\n");
     // 替换多行注释
-    data = data.replace(mulCommentReg, "");
+    data = data.replace(mulCommentReg, (...args) => {
+      const mulLine = args[0].split("\n");
+      const results = mulLine.map((item) => {
+        return "comment";
+      });
+      return results.join("\n");
+    });
     // 替换行尾注释
     data = data.replace(tailCommentReg, "");
     // 替换控制台输入表达式
