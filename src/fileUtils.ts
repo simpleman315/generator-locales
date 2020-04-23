@@ -242,7 +242,7 @@ const fileUtils = {
       // 匹配类似页面中<div>国际化</div>的中文
       let matchRegStr4 = `(${item})`;
       const matchReg4 = new RegExp(matchRegStr4, "g");
-      data = data.replace(matchReg4, `{formatMessage({id: '${key}'})}`);
+      data = data.replace(matchReg4, `{formatMessage({ id: '${key}'})}`);
     });
     fs.writeFileSync(filePath, data);
   },
