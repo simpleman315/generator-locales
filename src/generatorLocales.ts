@@ -3,7 +3,6 @@ import * as vscode from "vscode";
 import * as request from "request-promise";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
-import CONSTANTS from "./constants";
 
 /**
  *
