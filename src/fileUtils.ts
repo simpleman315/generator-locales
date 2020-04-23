@@ -247,13 +247,13 @@ const fileUtils = {
     // 正则替换文件中的中文为国际化表达式
     allZhCNs.map((item: string, index: number) => {
       let key = `${keyName}.${transENByallZhCNs[index]}`;
-      // 匹配类似页面中message.error('国际化xxx')的中文
+      // 匹配类似页面中message.error('国际化xxx')或者 return '国际化xxx'的中文
       let matchRegStr1 = `(\\')([^\\']*)(${item})([^\\']*)(\\')`;
       const matchReg1 = new RegExp(matchRegStr1, "g");
       data = data.replace(matchReg1, (...args: any) => {
         return `${qguid}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${qguid}`;
       });
-      // 匹配类似页面中message.error(`国际化xxx${text}`)的中文
+      // 匹配类似页面中message.error(`国际化xxx${text}`)或者 return `xxx${国际化}`的中文
       let matchRegStr2 = `(\`)([^\`]*)(${item})([^\`]*)(\`)`;
       const matchReg2 = new RegExp(matchRegStr2, "g");
       data = data.replace(matchReg2, (...args: any) => {
