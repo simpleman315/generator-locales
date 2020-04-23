@@ -221,15 +221,42 @@ const fileUtils = {
     let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
     let data = fs.readFileSync(filePath, "utf-8");
     // 正则替换文件中的中文为国际化表达式
-    allZhCNs.map((item: string) => {
-      // TODO 正则待完成
-      // 匹配类似页面中console.error(’国际化xxx‘)的中文，正则表达式字符串需要双转义
-      let matchRegStr1 = `(\\()(\\')([^\\(]*)(${item})([^\\)]*)(\\')(\\))`;
-      let matchReg1 = new RegExp(matchRegStr1,'g');
-      // 匹配类似页面中console.error(`国际化${msgType}`)的中文
-      let matchRegStr2 = `(\\()(\`)([^\\(]*)(${item})([^\\)]*)(\`)(\\))`;
+    allZhCNs.map((item: string, index: number) => {
+      let key = `${keyName}.${transENByallZhCNs[index]}`;
+      // 匹配类似页面中message.error('国际化xxx')的中文
+      let matchRegStr1 = `(.*)(\\')([^\\(]*)(${item})([^\\)]*)(\\')`;
+      const matchReg1 = new RegExp(matchRegStr1, "g");
+      data = data.replace(matchReg1, (...args: any) => {
+        if (args[0].indexOf("console.") !== -1) {
+          return args[0];
+        }
+        return `${args[1]}\`${args[3]}\${formatMessage({ id: '${key}' })}${args[5]}\``;
+      });
+      // 匹配类似页面中message.error(`国际化xxx${text}`)的中文
+      let matchRegStr2 = `(.*)(\`)([^\\(]*)(${item})([^\\)]*)(\`)`;
+      const matchReg2 = new RegExp(matchRegStr2, "g");
+      data = data.replace(matchReg2, (...args: any) => {
+        if (args[0].indexOf("console.") !== -1) {
+          return args[0];
+        }
+        return `${args[1]}${args[2]}${args[3]}\${formatMessage({ id: '${key}' })}${args[5]}${args[6]}`;
+      });
 
+      // 匹配类似页面中<div title="国际化"></div>的中文
+      let matchRegStr3 = `(\\")(${item})(\\")`;
+      const matchReg3 = new RegExp(matchRegStr3, "g");
+      data = data.replace(matchReg3, `{formatMessage({ id: '${key}' })}`);
+      // 匹配类似页面中<div>国际化</div>的中文
+      let matchRegStr4 = `(.*)(${item})`;
+      const matchReg4 = new RegExp(matchRegStr4, "g");
+      data = data.replace(matchReg4, (...args: any) => {
+        if (args[0].indexOf("console.") !== -1) {
+          return args[0];
+        }
+        return `${args[1]}{formatMessage({id: '${key}'})}`;
+      });
     });
+    fs.writeFileSync(filePath, data);
     callback(data);
   },
   /**
