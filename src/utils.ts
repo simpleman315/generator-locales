@@ -34,7 +34,7 @@ const utils = {
     if (content.search(regExp) < 0) {
       return { row: 0, col: 0 };
     }
-    const rows = content.split('\n');
+    const rows = content.split("\n");
     // 分行查找只为了拿到行
     for (let i = 0; i < rows.length; i++) {
       let col = rows[i].search(regExp);
@@ -106,9 +106,12 @@ const utils = {
    * 生成唯一ID
    */
   guid: function () {
-    return Number(Math.random().toString().substr(3, 3) + Date.now()).toString(
-      36
-    );
+    return Number(
+      Math.random().toString().substr(3, 3) +
+        Math.random().toString().substr(3, 3) +
+        Math.random().toString().substr(3, 3) +
+        Date.now()
+    ).toString(36);
   },
 };
 export default utils;

@@ -220,8 +220,27 @@ const fileUtils = {
    * @param callback 回调函数
    */
   replaceChZhToFormatmessage(options: any) {
+    const commentMap = new Map();
     let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
     let data = fs.readFileSync(filePath, "utf-8");
+    // 替换单行注释
+    data = data.replace(commentReg, (...args) => {
+      const id = utils.guid();
+      commentMap.set(id, args[0]);
+      return id;
+    });
+    // 替换多行注释
+    data = data.replace(mulCommentReg, (...args) => {
+      const id = utils.guid();
+      commentMap.set(id, args[0]);
+      return id;
+    });
+    // 替换行尾注释
+    data = data.replace(tailCommentReg, (...args) => {
+      const id = utils.guid();
+      commentMap.set(id, args[0]);
+      return id;
+    });
     // 占位单引号防止正则匹配错误
     const guid = utils.guid();
     const qguid = utils.guid();
@@ -259,6 +278,10 @@ const fileUtils = {
     data = data.replace(guidReg, "'");
     let qguidReg = new RegExp(qguid, "g");
     data = data.replace(qguidReg, "`");
+    // 还原注释
+    for (let [key, value] of commentMap) {
+      data = data.replace(key, value);
+    }
     fs.writeFileSync(filePath, data);
   },
   /**
