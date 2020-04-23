@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { Readable } from "stream";
 const join = path.join;
 import * as readline from "readline";
 import CONSTANTS from "./constants";
@@ -85,9 +86,20 @@ const fileUtils = {
    * callback:回调函数
    * */
   readFileChineseToArr(filePath: string, callback: any) {
-    let fRead = fs.createReadStream(filePath);
+    let data = fs.readFileSync(filePath, "utf-8");
+    // 替换单行注释
+    data = data.replace(commentReg, "");
+    // 替换多行注释
+    data = data.replace(mulCommentReg, "");
+    // 替换行尾注释
+    data = data.replace(tailCommentReg, "");
+    // 替换控制台输入表达式
+    data = data.replace(matchConsoleReg, "");
+
+    const readable = Readable.from(data);
+    // let fRead = fs.createReadStream(filePath);
     let objReadline = readline.createInterface({
-      input: fRead,
+      input: readable,
     });
     let arr: string[] = [];
     let formatMessageArr: string[] = [];
@@ -96,53 +108,40 @@ const fileUtils = {
     let lineNum = 1;
     objReadline.on("line", function (line) {
       let srcLine = line;
-      let comment = line.match(commentReg);
-      if (!(comment && comment.length > 0)) {
-        let mulComment = line.match(mulCommentReg);
-        if (!(mulComment && mulComment.length > 0)) {
-          // 替换行尾注释
-          line = line.replace(tailCommentReg, "");
-          // 过滤console中的中文
-          if (line && line.indexOf("console.") === -1) {
-            let regResult = line.match(chinaReg);
-            if (regResult && regResult.length > 0) {
-              regResult.map((item) => {
-                arr.push(item);
-                const positon = srcLine.indexOf(item);
-                matchFileLine.push(
-                  `// ${filePath} lineNum: ${lineNum} ${positon}`
-                );
-              });
-            }
-          }
+      let regResult = line.match(chinaReg);
+      if (regResult && regResult.length > 0) {
+        regResult.map((item) => {
+          arr.push(item);
+          const positon = srcLine.indexOf(item);
+          matchFileLine.push(`// ${filePath} lineNum: ${lineNum} ${positon}`);
+        });
+      }
 
-          let formatMsgs = line.match(formatMessageReg);
-          if (formatMsgs && formatMsgs.length > 0) {
-            formatMsgs.map((item) => {
-              let matches = formatMessageReg.exec(item);
-              if (matches && matches.length >= 1) {
-                formatMessageArr.push(matches[1]);
-                const positon = srcLine.indexOf(item);
-                formatMessageMatchFileLine.push(
-                  `// ${filePath} lineNum: ${lineNum} ${positon}`
-                );
-              }
-            });
+      let formatMsgs = line.match(formatMessageReg);
+      if (formatMsgs && formatMsgs.length > 0) {
+        formatMsgs.map((item) => {
+          let matches = formatMessageReg.exec(item);
+          if (matches && matches.length >= 1) {
+            formatMessageArr.push(matches[1]);
+            const positon = srcLine.indexOf(item);
+            formatMessageMatchFileLine.push(
+              `// ${filePath} lineNum: ${lineNum} ${positon}`
+            );
           }
-          let formatMsgsCap = line.match(formatMessageRegCap);
-          if (formatMsgsCap && formatMsgsCap.length > 0) {
-            formatMsgsCap.map((item) => {
-              let matches = formatMessageRegCap.exec(item);
-              if (matches && matches.length >= 1) {
-                formatMessageArr.push(matches[1]);
-                const positon = srcLine.indexOf(item);
-                formatMessageMatchFileLine.push(
-                  `// ${filePath} lineNum: ${lineNum} ${positon}`
-                );
-              }
-            });
+        });
+      }
+      let formatMsgsCap = line.match(formatMessageRegCap);
+      if (formatMsgsCap && formatMsgsCap.length > 0) {
+        formatMsgsCap.map((item) => {
+          let matches = formatMessageRegCap.exec(item);
+          if (matches && matches.length >= 1) {
+            formatMessageArr.push(matches[1]);
+            const positon = srcLine.indexOf(item);
+            formatMessageMatchFileLine.push(
+              `// ${filePath} lineNum: ${lineNum} ${positon}`
+            );
           }
-        }
+        });
       }
       lineNum += 1;
     });
