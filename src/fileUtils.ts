@@ -287,7 +287,7 @@ const fileUtils = {
     data = data.replace(guidReg, "'");
     let qguidReg = new RegExp(qguid, "g");
     data = data.replace(qguidReg, "`");
-    // 还原注释
+    // 还原过滤字符串
     for (let [key, value] of filterMap) {
       data = data.replace(key, value);
     }
