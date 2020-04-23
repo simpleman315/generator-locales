@@ -45,6 +45,7 @@ const fileUtils = {
       ".gif",
       ".d.ts",
       ".md",
+      ".html",
     ];
     let fileResults: string[] = [];
     function findFile(path: string) {
