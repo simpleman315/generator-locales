@@ -14,9 +14,6 @@ function provideDefinition(
   document: vscode.TextDocument,
   position: vscode.Position
 ) {
-  const fileName = document.fileName;
-  const workDir = path.dirname(fileName);
-  const folders = vscode.workspace.workspaceFolders;
   // const word = document.getText(document.getWordRangeAtPosition(position));
   const line = document.lineAt(position);
   let lineTxt = line.text.trim();
@@ -24,8 +21,10 @@ function provideDefinition(
   if (lineTxt && lineTxt.indexOf("lineNum") !== -1) {
     let matches = lineTxt.split(" ");
     if (matches && matches.length === 5) {
+      let currFilePath = matches[1];
+      let workRootDir = fileUtils.getWorkRootDirByCurrFilePath(currFilePath);
       return new vscode.Location(
-        vscode.Uri.file(matches[1]),
+        vscode.Uri.file(`${workRootDir}${currFilePath}`),
         new vscode.Position(parseInt(matches[3]) - 1, parseInt(matches[4]))
       );
     }

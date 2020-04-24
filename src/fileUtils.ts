@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
@@ -21,7 +22,8 @@ const mulCommentReg = /(\/\/.*$)|(\/\*(.|\s)*?\*\/)/g;
 // 匹配chrome console命令正则
 const matchConsoleReg = /console\..*\(.*\)/g;
 
-// const mulCommentReg = /^(^\s+)\*[\s\S]*/g;
+// 匹配路径前缀
+const startPath = /^(\\)([^\\]*)/g;
 
 // 行尾注释
 const tailCommentReg = /(?<!\:)\/\/[^\n]*/g;
@@ -87,23 +89,24 @@ const fileUtils = {
    * callback:回调函数
    * */
   readFileChineseToArr(filePath: string, callback: any) {
+    const relativePath = fileUtils.getRelativePath(filePath);
     let data = fs.readFileSync(filePath, "utf-8");
     // 替换行尾注释
-    data = data.replace(tailCommentReg, (...args)=>{
-      return args[0].replace(chinaReg,'');
+    data = data.replace(tailCommentReg, (...args) => {
+      return args[0].replace(chinaReg, "");
     });
     // 替换单行注释
-    data = data.replace(commentReg, (...args)=>{
-      return args[0].replace(chinaReg,'');
+    data = data.replace(commentReg, (...args) => {
+      return args[0].replace(chinaReg, "");
     });
     // 替换多行注释
-    data = data.replace(mulCommentReg, (...args)=>{
-      return args[0].replace(chinaReg,'');
+    data = data.replace(mulCommentReg, (...args) => {
+      return args[0].replace(chinaReg, "");
     });
 
     // 替换控制台输入表达式
-    data = data.replace(matchConsoleReg, (...args)=>{
-      return args[0].replace(chinaReg,'');
+    data = data.replace(matchConsoleReg, (...args) => {
+      return args[0].replace(chinaReg, "");
     });
     const readable = Readable.from(data);
     // let fRead = fs.createReadStream(filePath);
@@ -122,7 +125,9 @@ const fileUtils = {
         regResult.map((item) => {
           arr.push(item);
           const positon = srcLine.indexOf(item);
-          matchFileLine.push(`// ${filePath} lineNum: ${lineNum} ${positon}`);
+          matchFileLine.push(
+            `// ${relativePath} lineNum: ${lineNum} ${positon}`
+          );
         });
       }
 
@@ -134,7 +139,7 @@ const fileUtils = {
             formatMessageArr.push(matches[1]);
             const positon = srcLine.indexOf(item);
             formatMessageMatchFileLine.push(
-              `// ${filePath} lineNum: ${lineNum} ${positon}`
+              `// ${relativePath} lineNum: ${lineNum} ${positon}`
             );
           }
         });
@@ -147,7 +152,7 @@ const fileUtils = {
             formatMessageArr.push(matches[1]);
             const positon = srcLine.indexOf(item);
             formatMessageMatchFileLine.push(
-              `// ${filePath} lineNum: ${lineNum} ${positon}`
+              `// ${relativePath} lineNum: ${lineNum} ${positon}`
             );
           }
         });
@@ -372,6 +377,45 @@ const fileUtils = {
     }
     find(dir);
     return result;
+  },
+  /**
+   * 获取当前工作空间目录，由于vscode开启了多目录模式，需要通过当前路径和工作空间文件数组来比对匹配
+   * @param currFilePath 当前路径
+   */
+  getWorkRootDirByCurrFilePath(currFilePath: string) {
+    let workRoot = "";
+    const workspaceFolder = vscode.workspace.workspaceFolders;
+    if (workspaceFolder && workspaceFolder.length > 0) {
+      workspaceFolder.some((item) => {
+        let findIndex = item.uri.fsPath.lastIndexOf("\\");
+        let path = item.uri.fsPath.substring(findIndex);
+        let matchs = currFilePath.match(startPath);
+        if (matchs && matchs.length === 1 && matchs[0] === path) {
+          workRoot = item.uri.fsPath.substring(0, findIndex);
+          return true;
+        }
+      });
+    }
+    return workRoot;
+  },
+  /**
+   * 通过当前路径获取文件相对根目录路径
+   * @param currFilePath 当前路径
+   */
+  getRelativePath(currFilePath: string) {
+    let relativePath = "";
+    const workspaceFolder = vscode.workspace.workspaceFolders;
+    if (workspaceFolder && workspaceFolder.length > 0) {
+      workspaceFolder.some((item) => {
+        let findIndex = currFilePath.indexOf(item.uri.fsPath);
+        if (findIndex !== -1) {
+          relativePath = currFilePath.substring(item.uri.fsPath.length);
+          relativePath = `\\${item.name}${relativePath}`;
+          return true;
+        }
+      });
+    }
+    return relativePath;
   },
 };
 
