@@ -19,7 +19,7 @@
 		"*"
 	],
 	"engines": {
-		"vscode": "^1.44.0"
+		"vscode": "^1.43.0"
 	},
 	"main": "./out/extension.js",
 	"scripts": {
@@ -47,11 +47,9 @@
 		}
 	},
 	"devDependencies": {
-		"@types/request": "^2.48.4",
-		"@types/request-promise": "^4.1.46",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
-		"@types/node": "^13.11.0",
+		"@types/node": "^13.13.2",
 		"@types/vscode": "^1.44.0",
 		"@typescript-eslint/eslint-plugin": "^2.26.0",
 		"@typescript-eslint/parser": "^2.26.0",
@@ -63,15 +61,11 @@
 	},
 	"license": "SEE LICENSE IN LICENSE.txt",
 	"bugs": {
-		"url": "https://github.com/simpleman315/generator-locales/issues"
+		"url": "https://github.com/simpleman315/vv-generator-locales/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/simpleman315/generator-locales"
+		"url": "https://github.com/simpleman315/vv-generator-locales"
 	},
-	"homepage": "https://github.com/simpleman315/generator-locales/blob/master/README.md",
-	"dependencies": {
-		"request": "^2.88.2",
-		"request-promise": "^4.2.5"
-	}
+	"homepage": "https://github.com/simpleman315/vv-generator-locales/blob/master/README.md"
 }
