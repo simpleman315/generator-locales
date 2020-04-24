@@ -5,6 +5,8 @@ import fileUtils from "./fileUtils";
 import utils from "./utils";
 import constants from "./constants";
 const localesIndent = "    ";
+// 常用因为字符正则
+const enSymbolsReg = /[@#()'",;?%&!$~:*-/\[\]]+/g;
 
 /**
  *
@@ -122,20 +124,21 @@ async function translate(allZhCNs: string[]): Promise<any> {
       }
       options.url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`;
       const result = await request(options);
-      console.error(result);
       return result;
     })
   );
   translateAllZhCNs = results.map((item, index) => {
     try {
       let translateWords = item.translateResult[0][0].tgt;
-      // 去除翻译文本包含的逗号
-      translateWords = translateWords.replace(",", "");
+      // 去除翻译文本包含的常用英文标点符号
+      translateWords = translateWords.replace(enSymbolsReg, "");
       if (translateWords.indexOf(".") !== -1) {
         let results: string[] = [];
         let splitWords = translateWords.split(".");
         splitWords.map((item: string) => {
-          results.push(utils.wordsToHump(item));
+          if (item) {
+            results.push(utils.wordsToHump(item));
+          }
         });
         return results.join(".");
       }
