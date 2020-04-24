@@ -47,6 +47,8 @@
 		}
 	},
 	"devDependencies": {
+		"@types/request": "^2.48.4",
+		"@types/request-promise": "^4.1.46",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
 		"@types/node": "^13.11.0",
@@ -69,8 +71,6 @@
 	},
 	"homepage": "https://github.com/simpleman315/generator-locales/blob/master/README.md",
 	"dependencies": {
-		"@types/request": "^2.48.4",
-		"@types/request-promise": "^4.1.46",
 		"request": "^2.88.2",
 		"request-promise": "^4.2.5"
 	}
