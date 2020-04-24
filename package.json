@@ -61,13 +61,13 @@
 	},
 	"license": "SEE LICENSE IN LICENSE.txt",
 	"bugs": {
-		"url": "https://github.com/simpleman315/vv-generator-locales/issues"
+		"url": "https://github.com/simpleman315/generator-locales/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/simpleman315/vv-generator-locales"
+		"url": "https://github.com/simpleman315/generator-locales"
 	},
-	"homepage": "https://github.com/simpleman315/vv-generator-locales/blob/master/README.md",
+	"homepage": "https://github.com/simpleman315/generator-locales/blob/master/README.md",
 	"dependencies": {
 		"@types/request": "^2.48.4",
 		"@types/request-promise": "^4.1.46",
