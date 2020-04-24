@@ -25,19 +25,17 @@ const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.]*)['|"][
 const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.]*)['|"][\s\S]*>/g;
 
 // 单行注释正则
-const commentReg = /(?:^|\n|\r)\s*\/\/.*(?:\r|\n|$)/g;
+const commentReg = /(\/\/[^\n\r]*[\n\r]+)/g;
 
 // 多行注释
-const mulCommentReg = /(\/\/.*$)|(\/\*(.|\s)*?\*\/)/g;
+const mulCommentReg = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)/g;
+
 
 // 匹配chrome console命令正则
 const matchConsoleReg = /console\..*\(.*\)/g;
 
 // 匹配路径前缀
 const startPath = /^(\\)([^\\]*)/g;
-
-// 行尾注释
-const tailCommentReg = /(?<!\:)\/\/[^\n]*/g;
 
 const fileUtils = {
   getFilesByDir(dir: string) {
@@ -102,10 +100,6 @@ const fileUtils = {
   readFileChineseToArr(filePath: string, callback: any) {
     const relativePath = fileUtils.getRelativePath(filePath);
     let data = fs.readFileSync(filePath, "utf-8");
-    // 替换行尾注释
-    data = data.replace(tailCommentReg, (...args) => {
-      return args[0].replace(chinaReg, "");
-    });
     // 替换单行注释
     data = data.replace(commentReg, (...args) => {
       return args[0].replace(chinaReg, "");
@@ -275,12 +269,6 @@ const fileUtils = {
     });
     // 替换多行注释
     data = data.replace(mulCommentReg, (...args) => {
-      const id = utils.guid();
-      filterMap.set(id, args[0]);
-      return id;
-    });
-    // 替换行尾注释
-    data = data.replace(tailCommentReg, (...args) => {
       const id = utils.guid();
       filterMap.set(id, args[0]);
       return id;
