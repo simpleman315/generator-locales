@@ -9,6 +9,12 @@ import utils from "./utils";
 // 中文汉子和符号正则
 const chinaReg = /([\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+)/g;
 
+// 增加自定义规则匹配，比如（表格.表单.国际化）
+const matchCusChinaReg = /([\u4e00-\u9fa5]+[.]{1}[\u4e00-\u9fa5.]*[\u4e00-\u9fa5]+)/g;
+
+// 增加自定义规则匹配，比如（很长的中文文字需要/截取）
+const matchCusLongChinaReg = /([\u4e00-\u9fa5]+[/]{1}[\u4e00-\u9fa5]+)/g;
+
 // 国际化标识正则
 const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.]*)['|"][\s]*\}\)/g;
 const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.]*)['|"][\s\S]*>/g;
@@ -120,6 +126,23 @@ const fileUtils = {
     let lineNum = 1;
     objReadline.on("line", function (line) {
       let srcLine = line;
+
+      // 匹配自定义表单.国际化 中文
+      line = line.replace(matchCusChinaReg, (...args) => {
+        const positon = srcLine.indexOf(args[0]);
+        matchFileLine.push(`// ${relativePath} lineNum: ${lineNum} ${positon}`);
+        arr.push(args[0]);
+        return "";
+      });
+
+      // 匹配很长需要切割的中文
+      line = line.replace(matchCusLongChinaReg, (...args) => {
+        const positon = srcLine.indexOf(args[0]);
+        matchFileLine.push(`// ${relativePath} lineNum: ${lineNum} ${positon}`);
+        arr.push(args[0]);
+        return "";
+      });
+
       let regResult = line.match(chinaReg);
       if (regResult && regResult.length > 0) {
         regResult.map((item) => {

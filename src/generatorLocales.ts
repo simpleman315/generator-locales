@@ -4,6 +4,7 @@ import * as request from "request-promise";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
 import constants from "./constants";
+const localesIndent = "    ";
 
 /**
  *
@@ -42,7 +43,7 @@ function writeLocalesByData(
   // 设置已经存在的国际化，但页面未使用过
   if (noSetMap.size > 0) {
     for (let [key, value] of noSetMap) {
-      data.push(`    '${key}': '${value}',`);
+      data.push(`${localesIndent}'${key}': '${value}',`);
     }
   }
 
@@ -54,9 +55,15 @@ function writeLocalesByData(
       let genKey = `${fileName}.${noRepeatTransENByallZhCNs[index]}`;
       let allIndex = utils.findAllIndex(allZhCNs, item);
       allIndex.map((indexItem: any) => {
-        data.push(`    ${allZhCNPositions[indexItem]}`);
+        data.push(`${localesIndent}${allZhCNPositions[indexItem]}`);
       });
-      data.push(`    '${genKey}': '${item}',`);
+      // 处理长中文
+      let zhCN = item.replace("/", "");
+      // 处理.分隔的国际化中文
+      if (zhCN.indexOf(".") !== -1) {
+        zhCN = zhCN.substring(zhCN.lastIndexOf(".") + 1);
+      }
+      data.push(`${localesIndent}'${genKey}': '${zhCN}',`);
     });
   }
 
@@ -66,9 +73,9 @@ function writeLocalesByData(
     noRepeatAllFormatMessages.map((item) => {
       let allIndex = utils.findAllIndex(allFormatMessages, item);
       allIndex.map((indexItem: any) => {
-        data.push(`    ${allFormatMessagePositions[indexItem]}`);
+        data.push(`${localesIndent}${allFormatMessagePositions[indexItem]}`);
       });
-      data.push(`    '${item}': '${isExistLocalesMap.get(item)}',`);
+      data.push(`${localesIndent}'${item}': '${isExistLocalesMap.get(item)}',`);
     });
   }
   // 去除最后一行逗号
@@ -104,7 +111,15 @@ async function translate(allZhCNs: string[]): Promise<any> {
   };
   const results = await Promise.all(
     allZhCNs.map(async (item) => {
-      let enItem = global.encodeURIComponent(item);
+      let enItem = "";
+      // 处理长中文
+      if (item.indexOf("/") !== -1) {
+        enItem = global.encodeURIComponent(
+          item.substring(0, item.indexOf("/"))
+        );
+      } else {
+        enItem = global.encodeURIComponent(item);
+      }
       options.url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`;
       const result = await request(options);
       console.error(result);
@@ -114,8 +129,15 @@ async function translate(allZhCNs: string[]): Promise<any> {
   translateAllZhCNs = results.map((item, index) => {
     try {
       let translateWords = item.translateResult[0][0].tgt;
-      let hump = utils.wordsToHump(translateWords);
-      return hump;
+      if (translateWords.indexOf(".") !== -1) {
+        let results: string[] = [];
+        let splitWords = translateWords.split(".");
+        splitWords.map((item: string) => {
+          results.push(utils.wordsToHump(item));
+        });
+        return results.join(".");
+      }
+      return utils.wordsToHump(translateWords);
     } catch (error) {
       return `${constants.translationFailed}${encodeURIComponent(
         allZhCNs[index]
