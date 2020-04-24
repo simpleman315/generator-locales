@@ -343,13 +343,13 @@ const fileUtils = {
     allZhCNObjs.map((item: ZhCNObjs, index: number) => {
       let key = `${keyName}.${item.en}`;
       // 匹配类似页面中message.error('国际化xxx')或者 return '国际化xxx'的中文
-      let matchRegStr1 = `(\\')([^\\']*)(${item.zhCN})([^\\']*)(\\')`;
+      let matchRegStr1 = `(')([^\r\n']*)(${item.zhCN})([^\r\n']*)(')`;
       const matchReg1 = new RegExp(matchRegStr1, "g");
       data = data.replace(matchReg1, (...args: any) => {
         return `${qguid}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${qguid}`;
       });
       // 匹配类似页面中message.error(`国际化xxx${text}`)或者 return `xxx${国际化}`的中文
-      let matchRegStr2 = `(\`)([^\`]*)(${item.zhCN})([^\`]*)(\`)`;
+      let matchRegStr2 = `(\`)([^\r\n\`]*)(${item.zhCN})([^\r\n\`]*)(\`)`;
       const matchReg2 = new RegExp(matchRegStr2, "g");
       data = data.replace(matchReg2, (...args: any) => {
         return `${args[1]}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${args[5]}`;

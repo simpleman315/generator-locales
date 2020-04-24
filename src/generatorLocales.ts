@@ -5,8 +5,8 @@ import fileUtils from "./fileUtils";
 import utils from "./utils";
 import constants from "./constants";
 const localesIndent = "    ";
-// 常用因为字符正则
-const enSymbolsReg = /[@#()'",;?%&!$~:*-/\[\]]+/g;
+// 常用英文字符正则
+const enSymbolsReg = /[@#()'",;?%&!$~:*-]/g;
 
 /**
  *
