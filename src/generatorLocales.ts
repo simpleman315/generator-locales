@@ -4,9 +4,9 @@ import * as request from "request-promise";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
 import constants from "./constants";
+import { enSymbolsReg } from "./regExp";
 const localesIndent = "    ";
 // 常用英文字符正则
-const enSymbolsReg = /[@#()'",;?%&!$~:*-]/g;
 
 /**
  *

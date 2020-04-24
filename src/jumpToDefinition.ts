@@ -2,10 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import fileUtils from "./fileUtils";
 import utils from "./utils";
-
-// 国际化标识正则
-const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.%]*)['|"][\s]*\}\)/g;
-const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.%]*)['|"][\s\S]*>/g;
+import { formatMessageReg, formatMessageRegCap, slashReg } from "./regExp";
 /**
  * @param {*} document
  * @param {*} position
@@ -21,8 +18,10 @@ function provideDefinition(
   if (lineTxt && lineTxt.indexOf("lineNum") !== -1) {
     let matches = lineTxt.split(" ");
     if (matches && matches.length === 5) {
-      let currFilePath = matches[1];
-      let workRootDir = fileUtils.getWorkRootDirByCurrFilePath(currFilePath);
+      let currFilePath = path.join(matches[1]).replace(slashReg, path.sep);
+      let workRootDir = fileUtils
+        .getWorkRootDirByCurrFilePath(currFilePath)
+        .replace(slashReg, path.sep);
       return new vscode.Location(
         vscode.Uri.file(`${workRootDir}${currFilePath}`),
         new vscode.Position(parseInt(matches[3]) - 1, parseInt(matches[4]))

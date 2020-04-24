@@ -6,37 +6,23 @@ const join = path.join;
 import * as readline from "readline";
 import CONSTANTS from "./constants";
 import utils from "./utils";
+import {
+  chinaReg,
+  matchCusChinaReg,
+  matchCusLongChinaReg,
+  formatMessageReg,
+  formatMessageRegCap,
+  commentReg,
+  mulCommentReg,
+  matchConsoleReg,
+  startPath,
+  slashReg,
+} from "./regExp";
 
 interface ZhCNObjs {
   zhCN: string;
   en: String;
 }
-// 中文汉子和符号正则
-const chinaReg = /([\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+)/g;
-
-// 增加自定义规则匹配，比如（表格.表单.国际化）
-const matchCusChinaReg = /([\u4e00-\u9fa5]+[.]{1}[\u4e00-\u9fa5.]*[\u4e00-\u9fa5]+)/g;
-
-// 增加自定义规则匹配，比如（很长的中文文字需要/截取）
-const matchCusLongChinaReg = /([\u4e00-\u9fa5]+[/]{1}[\u4e00-\u9fa5]+)/g;
-
-// 国际化标识正则
-const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.]*)['|"][\s]*\}\)/g;
-const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.]*)['|"][\s\S]*>/g;
-
-// 单行注释正则
-const commentReg = /(\/\/[^\n\r]*[\n\r]+)/g;
-
-// 多行注释
-const mulCommentReg = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)/g;
-
-
-// 匹配chrome console命令正则
-const matchConsoleReg = /console\..*\(.*\)/g;
-
-// 匹配路径前缀
-const startPath = /^(\\)([^\\]*)/g;
-
 const fileUtils = {
   getFilesByDir(dir: string) {
     const filterDirectory = [
@@ -440,10 +426,14 @@ const fileUtils = {
     const workspaceFolder = vscode.workspace.workspaceFolders;
     if (workspaceFolder && workspaceFolder.length > 0) {
       workspaceFolder.some((item) => {
-        let findIndex = item.uri.fsPath.lastIndexOf("\\");
-        let path = item.uri.fsPath.substring(findIndex);
+        let findIndex = item.uri.fsPath.lastIndexOf(path.sep);
+        let rootPath = item.uri.fsPath.substring(findIndex);
         let matchs = currFilePath.match(startPath);
-        if (matchs && matchs.length === 1 && matchs[0] === path) {
+        if (
+          matchs &&
+          matchs.length === 1 &&
+          matchs[0].replace(slashReg, "") === rootPath.replace(slashReg, "")
+        ) {
           workRoot = item.uri.fsPath.substring(0, findIndex);
           return true;
         }
@@ -463,7 +453,7 @@ const fileUtils = {
         let findIndex = currFilePath.indexOf(item.uri.fsPath);
         if (findIndex !== -1) {
           relativePath = currFilePath.substring(item.uri.fsPath.length);
-          relativePath = `\\${item.name}${relativePath}`;
+          relativePath = `${path.sep}${item.name}${relativePath}`;
           return true;
         }
       });
