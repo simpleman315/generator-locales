@@ -16,6 +16,8 @@ This is the README for your extension "generator-locales". After writing up a br
 
 5、点击页面中的'menu.demo.xxx'可以跳转到国际化资源配置文件对应的位置(目前只支持跳转到zh-CN文件)
 
+6、支持特殊key的定制，比如页面中输入表单.按钮 则会生成 form.button，长中文字符为了防止翻译的key过长可以使用/符号截取，例如我是一窜很长很长的/中文句子，那么/后面的中文将不会被翻译成key 
+
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
 ## Requirements
