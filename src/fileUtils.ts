@@ -390,10 +390,7 @@ const fileUtils = {
           let val = items[1].trim();
           key = key.substring(key.indexOf("'") + 1, key.lastIndexOf("'"));
           val = val.substring(val.indexOf("'") + 1, val.lastIndexOf("'"));
-          // 排除自动生成的key
-          if (key !== CONSTANTS.genKey) {
-            processDatas.set(key, val);
-          }
+          processDatas.set(key, val);
         }
       }
     });
