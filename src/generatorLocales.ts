@@ -129,6 +129,8 @@ async function translate(allZhCNs: string[]): Promise<any> {
   translateAllZhCNs = results.map((item, index) => {
     try {
       let translateWords = item.translateResult[0][0].tgt;
+      // 去除翻译文本包含的逗号
+      translateWords = translateWords.replace(",", "");
       if (translateWords.indexOf(".") !== -1) {
         let results: string[] = [];
         let splitWords = translateWords.split(".");

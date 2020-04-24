@@ -6,6 +6,11 @@ const join = path.join;
 import * as readline from "readline";
 import CONSTANTS from "./constants";
 import utils from "./utils";
+
+interface ZhCNObjs {
+  zhCN: string;
+  en: String;
+}
 // 中文汉子和符号正则
 const chinaReg = /([\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+)/g;
 
@@ -289,36 +294,26 @@ const fileUtils = {
     // 占位单引号防止正则匹配错误
     const guid = utils.guid();
     const qguid = utils.guid();
-    // 正则替换文件中的中文为国际化表达式
+    const allZhCNObjs: ZhCNObjs[] = [];
     allZhCNs.map((item: string, index: number) => {
-      let key = `${keyName}.${transENByallZhCNs[index]}`;
-      // 匹配类似页面中message.error('国际化xxx')或者 return '国际化xxx'的中文
-      let matchRegStr1 = `(\\')([^\\']*)(${item})([^\\']*)(\\')`;
-      const matchReg1 = new RegExp(matchRegStr1, "g");
-      data = data.replace(matchReg1, (...args: any) => {
-        return `${qguid}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${qguid}`;
-      });
-      // 匹配类似页面中message.error(`国际化xxx${text}`)或者 return `xxx${国际化}`的中文
-      let matchRegStr2 = `(\`)([^\`]*)(${item})([^\`]*)(\`)`;
-      const matchReg2 = new RegExp(matchRegStr2, "g");
-      data = data.replace(matchReg2, (...args: any) => {
-        return `${args[1]}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${args[5]}`;
-      });
-
-      // 匹配类似页面中<div title="国际化"></div>的中文
-      let matchRegStr3 = `(\\")(${item})(\\")`;
-      const matchReg3 = new RegExp(matchRegStr3, "g");
-      data = data.replace(
-        matchReg3,
-        `{formatMessage({ id: ${guid}${key}${guid} })}`
-      );
-      // 匹配类似页面中<div>国际化</div>的中文
-      let matchRegStr4 = `(${item})`;
-      const matchReg4 = new RegExp(matchRegStr4, "g");
-      data = data.replace(matchReg4, (...args: any) => {
-        return `{formatMessage({ id: ${guid}${key}${guid} })}`;
+      allZhCNObjs.push({
+        zhCN: item,
+        en: transENByallZhCNs[index],
       });
     });
+    // 字符长的中文排在前面，防止正则包含匹配
+    allZhCNObjs.sort((a: ZhCNObjs, b: ZhCNObjs) => {
+      return b.zhCN.length - a.zhCN.length;
+    });
+    // 正则替换文件中的中文为国际化表达式
+    data = fileUtils._replaceZhCNToFormatMessage(
+      data,
+      keyName,
+      allZhCNObjs,
+      guid,
+      qguid
+    );
+    //替换回单引号和`符号
     let guidReg = new RegExp(guid, "g");
     data = data.replace(guidReg, "'");
     let qguidReg = new RegExp(qguid, "g");
@@ -328,6 +323,53 @@ const fileUtils = {
       data = data.replace(key, value);
     }
     fs.writeFileSync(filePath, data);
+  },
+
+  /**
+   * 将data中的中文替换成国际化标签
+   * @param data 需要替换的字符串
+   * @param keyName 国际化标签前缀
+   * @param allZhCNObjs 中英文对象数组
+   * @param guid 单引号替换字符
+   * @param qguid `符号替换字符
+   */
+  _replaceZhCNToFormatMessage(
+    data: string,
+    keyName: string,
+    allZhCNObjs: ZhCNObjs[],
+    guid: string,
+    qguid: string
+  ): string {
+    allZhCNObjs.map((item: ZhCNObjs, index: number) => {
+      let key = `${keyName}.${item.en}`;
+      // 匹配类似页面中message.error('国际化xxx')或者 return '国际化xxx'的中文
+      let matchRegStr1 = `(\\')([^\\']*)(${item.zhCN})([^\\']*)(\\')`;
+      const matchReg1 = new RegExp(matchRegStr1, "g");
+      data = data.replace(matchReg1, (...args: any) => {
+        return `${qguid}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${qguid}`;
+      });
+      // 匹配类似页面中message.error(`国际化xxx${text}`)或者 return `xxx${国际化}`的中文
+      let matchRegStr2 = `(\`)([^\`]*)(${item.zhCN})([^\`]*)(\`)`;
+      const matchReg2 = new RegExp(matchRegStr2, "g");
+      data = data.replace(matchReg2, (...args: any) => {
+        return `${args[1]}${args[2]}\${formatMessage({ id: ${guid}${key}${guid} })}${args[4]}${args[5]}`;
+      });
+
+      // 匹配类似页面中<div title="国际化"></div>的中文
+      let matchRegStr3 = `(\\")(${item.zhCN})(\\")`;
+      const matchReg3 = new RegExp(matchRegStr3, "g");
+      data = data.replace(
+        matchReg3,
+        `{formatMessage({ id: ${guid}${key}${guid} })}`
+      );
+      // 匹配类似页面中<div>国际化</div>的中文
+      let matchRegStr4 = `(${item.zhCN})`;
+      const matchReg4 = new RegExp(matchRegStr4, "g");
+      data = data.replace(matchReg4, (...args: any) => {
+        return `{formatMessage({ id: ${guid}${key}${guid} })}`;
+      });
+    });
+    return data;
   },
   /**
    *
