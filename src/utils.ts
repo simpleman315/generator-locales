@@ -1,6 +1,7 @@
 import * as fs from "fs";
-import * as os from "os";
 import * as vscode from "vscode";
+import CONSTANTS from "./constants";
+
 const utils = {
   /**
    * @param {*} arr 数组
@@ -112,6 +113,33 @@ const utils = {
         Math.random().toString().substr(3, 3) +
         Date.now()
     ).toString(36);
+  },
+  // 将中文数组切割成几个小的包含长字符的中文数据，用于减少百度翻译请求
+  getConcatLongStrByAllZhCNs(allZhCNs: string[]) {
+    let resultArr: string[] = [];
+    if (allZhCNs && allZhCNs.length > 0) {
+      let allZhCNsStr: string = allZhCNs.join(CONSTANTS.transSplitSymbolEN);
+      // 替换所有中文分号字符防止被翻译成英文分号字符
+      allZhCNsStr = allZhCNsStr.replace(CONSTANTS.transSplitSymbolZH, "");
+      let processAllZhCNs = allZhCNsStr.split(CONSTANTS.transSplitSymbolEN);
+      let longStr: string = "";
+      processAllZhCNs.map((item, index) => {
+        // 处理长中文，截取/后面的中文不做翻译
+        if (item.indexOf("/") !== -1) {
+          item = item.substring(0, item.indexOf("/"));
+        }
+        if (longStr.length <= 2000) {
+          longStr += `${item}${CONSTANTS.transSplitSymbolEN}`;
+          if (index === processAllZhCNs.length - 1) {
+            resultArr.push(longStr);
+          }
+        } else {
+          resultArr.push(longStr);
+          longStr = `${item}${CONSTANTS.transSplitSymbolEN}`;
+        }
+      });
+    }
+    return resultArr;
   },
 };
 export default utils;

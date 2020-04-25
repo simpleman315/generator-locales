@@ -1,10 +1,11 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import * as request from "request-promise";
+const md5 = require("blueimp-md5");
 import fileUtils from "./fileUtils";
 import utils from "./utils";
-import constants from "./constants";
 import { enSymbolsReg } from "./regExp";
+import CONSTANTS from "./constants";
 const localesIndent = "    ";
 // 常用英文字符正则
 
@@ -92,62 +93,78 @@ function writeLocalesByData(
   vscode.window.showInformationMessage("国际化文件生成成功！");
 }
 
-async function translate(allZhCNs: string[]): Promise<any> {
+/**
+ * 百度翻译
+ * @param allZhCNs 等待翻译中文列表
+ */
+async function translateBD(allZhCNs: string[]): Promise<any> {
   let translateAllZhCNs: string[] = [];
   const options = {
-    url: "",
-    headers: {
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-      "Cache-Control": "max-age=0",
-      Connection: "keep-alive",
-      Cookie:
-        'OUTFOX_SEARCH_USER_ID_NCOO=703353445.1243408; OUTFOX_SEARCH_USER_ID="-964541302@10.169.0.83"; _ga=GA1.2.277377119.1584954051; UM_distinctid=171a48fe2414a1-090d8aef44032a-b363e65-1fa400-171a48fe2427f3',
-      Host: "fanyi.youdao.com",
-      "Upgrade-Insecure-Requests": 1,
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
+    method: "POST",
+    url: "https://fanyi-api.baidu.com/api/trans/vip/translate",
+    form: {
+      q: "",
+      from: "zh",
+      to: "en",
+      salt: 0,
+      appid: CONSTANTS.appID,
+      sign: "",
     },
-    json: true, // Automatically parses the JSON string in the response
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
   };
   const results = await Promise.all(
-    allZhCNs.map(async (item) => {
-      let enItem = "";
-      // 处理长中文
-      if (item.indexOf("/") !== -1) {
-        enItem = global.encodeURIComponent(
-          item.substring(0, item.indexOf("/"))
-        );
-      } else {
-        enItem = global.encodeURIComponent(item);
-      }
-      options.url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${enItem}`;
-      const result = await request(options);
-      return result;
+    allZhCNs.map(async (item, index) => {
+      let salt = new Date().getTime();
+      options.form.q = item;
+      options.form.salt = salt;
+      options.form.sign = md5(
+        `${CONSTANTS.appID}${item}${salt}${CONSTANTS.key}`
+      );
+      // 百度开发api限制，1秒只能请求一次
+      let timeout = (index + 1) * 2000;
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(request(options));
+        }, timeout);
+      });
+      // const result = await request(options);
+      // return result;
     })
   );
-  translateAllZhCNs = results.map((item, index) => {
+  // 将拼接成的长字符翻译后转成原来的字符
+  let resetTranslateAllZhCNs: string[] = [];
+  results.map((item: any, index: number) => {
     try {
-      let translateWords = item.translateResult[0][0].tgt;
-      // 去除翻译文本包含的常用英文标点符号
-      translateWords = translateWords.replace(enSymbolsReg, "");
-      if (translateWords.indexOf(".") !== -1) {
-        let results: string[] = [];
-        let splitWords = translateWords.split(".");
-        splitWords.map((item: string) => {
-          if (item) {
-            results.push(utils.wordsToHump(item));
-          }
-        });
-        return results.join(".");
-      }
-      return utils.wordsToHump(translateWords);
+      let itemObj: any = JSON.parse(item);
+      let translateWords = itemObj.trans_result[0].dst;
+      resetTranslateAllZhCNs = resetTranslateAllZhCNs.concat(translateWords.split(CONSTANTS.transSplitSymbolEN));
     } catch (error) {
-      return `${constants.translationFailed}${encodeURIComponent(
-        allZhCNs[index]
-      )}`;
+      // 设置翻译失败的中文
+      let failZhCNs = allZhCNs[index].split(CONSTANTS.transSplitSymbolEN);
+      failZhCNs.map((item) => {
+        resetTranslateAllZhCNs.push(`${CONSTANTS.translationFailed}${item}`);
+      });
     }
+  });
+
+  // 处理成驼峰形式
+  translateAllZhCNs = resetTranslateAllZhCNs.map((item: any, index: number) => {
+    let translateWords = item;
+    // 去除翻译文本包含的常用英文标点符号
+    translateWords = translateWords.replace(enSymbolsReg, "");
+    if (translateWords.indexOf(".") !== -1) {
+      let results: string[] = [];
+      let splitWords = translateWords.split(".");
+      splitWords.map((subitem: string) => {
+        if (subitem) {
+          results.push(utils.wordsToHump(subitem));
+        }
+      });
+      return results.join(".");
+    }
+    return utils.wordsToHump(translateWords);
   });
   return Promise.resolve(translateAllZhCNs);
 }
@@ -199,7 +216,8 @@ const generatorLocales = {
         currIndex++;
 
         if (currIndex === files.length) {
-          const transENByallZhCNs = await translate(allZhCNs);
+          const allLongZhCNs = utils.getConcatLongStrByAllZhCNs(allZhCNs);
+          const transENByallZhCNs = await translateBD(allLongZhCNs);
           // 将包含中文的文件替换成国际化标签，此处异步操作完成
           fileUtils.writeFormateMessageToFile(
             includesZhCNFiles,
