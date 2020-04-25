@@ -129,13 +129,13 @@ const utils = {
           item = item.substring(0, item.indexOf("/"));
         }
         if (longStr.length <= 2000) {
-          longStr += `${item}${CONSTANTS.transSplitSymbolEN}`;
+          longStr += `${item}${CONSTANTS.transSplitSymbolZH}`;
           if (index === processAllZhCNs.length - 1) {
             resultArr.push(longStr);
           }
         } else {
           resultArr.push(longStr);
-          longStr = `${item}${CONSTANTS.transSplitSymbolEN}`;
+          longStr = `${item}${CONSTANTS.transSplitSymbolZH}`;
         }
       });
     }

@@ -3,8 +3,8 @@ const CONSTANTS = {
   appID: "20200425000429916",
   key: "3nFkn7pLG8XKPUdiH4Ue",
   // 英文
-  transSplitSymbolEN: "!",
+  transSplitSymbolEN: ".",
   // 中文
-  transSplitSymbolZH: "！"
+  transSplitSymbolZH: "。"
 };
 export default CONSTANTS;
