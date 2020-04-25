@@ -131,9 +131,13 @@ const utils = {
         if (longStr.length <= 2000) {
           longStr += `${item}${CONSTANTS.transSplitSymbolZH}`;
           if (index === processAllZhCNs.length - 1) {
+            // 过滤最后一个分割符号
+            longStr = longStr.substring(0, longStr.length - 1);
             resultArr.push(longStr);
           }
         } else {
+          // 过滤最后一个分割符号
+          longStr = longStr.substring(0, longStr.length - 1);
           resultArr.push(longStr);
           longStr = `${item}${CONSTANTS.transSplitSymbolZH}`;
         }
