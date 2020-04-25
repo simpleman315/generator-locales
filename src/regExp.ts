@@ -26,4 +26,4 @@ export const startPath = /[\/\\][^\/\\]*/;
 // 匹配正斜杠和反斜杠
 export let slashReg = /[\/\\]/g;
 // 常用英文字符正则
-export const enSymbolsReg = /[@#()'",;?%&!$~:*-]/g;
+export const enSymbolsReg = /[@#()'",;?%&$~:*-]/g;

@@ -154,16 +154,16 @@ async function translateBD(allZhCNs: string[]): Promise<any> {
     let translateWords = item;
     // 去除翻译文本包含的常用英文标点符号
     translateWords = translateWords.replace(enSymbolsReg, "");
-    // if (translateWords.indexOf(".") !== -1) {
-    //   let results: string[] = [];
-    //   let splitWords = translateWords.split(".");
-    //   splitWords.map((subitem: string) => {
-    //     if (subitem) {
-    //       results.push(utils.wordsToHump(subitem));
-    //     }
-    //   });
-    //   return results.join(".");
-    // }
+    if (translateWords.indexOf("!") !== -1) {
+      let results: string[] = [];
+      let splitWords = translateWords.split("!");
+      splitWords.map((subitem: string) => {
+        if (subitem) {
+          results.push(utils.wordsToHump(subitem));
+        }
+      });
+      return results.join(".");
+    }
     return utils.wordsToHump(translateWords);
   });
   return Promise.resolve(translateAllZhCNs);

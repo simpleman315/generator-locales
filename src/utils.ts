@@ -118,12 +118,14 @@ const utils = {
   getConcatLongStrByAllZhCNs(allZhCNs: string[]) {
     let resultArr: string[] = [];
     if (allZhCNs && allZhCNs.length > 0) {
-      let allZhCNsStr: string = allZhCNs.join(CONSTANTS.transSplitSymbolEN);
+      let allZhCNsStr: string = allZhCNs.join('split');
       // 替换所有中文分号字符防止被翻译成英文分号字符
       allZhCNsStr = allZhCNsStr.replace(CONSTANTS.transSplitSymbolZH, "");
-      let processAllZhCNs = allZhCNsStr.split(CONSTANTS.transSplitSymbolEN);
+      let processAllZhCNs = allZhCNsStr.split('split');
       let longStr: string = "";
       processAllZhCNs.map((item, index) => {
+        // 将表单.按钮 页面定制化的转成!号
+        item = item.replace('.','!');
         // 处理长中文，截取/后面的中文不做翻译
         if (item.indexOf("/") !== -1) {
           item = item.substring(0, item.indexOf("/"));
