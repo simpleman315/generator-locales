@@ -8,6 +8,7 @@ import CONSTANTS from "./constants";
 import utils from "./utils";
 import {
   chinaReg,
+  chinaAndChinaSymbolsReg,
   matchCusChinaReg,
   matchCusLongChinaReg,
   formatMessageReg,
@@ -89,16 +90,16 @@ const fileUtils = {
     let data = fs.readFileSync(filePath, "utf-8");
     // 替换单行注释
     data = data.replace(commentReg, (...args) => {
-      return args[0].replace(chinaReg, "");
+      return args[0].replace(chinaAndChinaSymbolsReg, "");
     });
     // 替换多行注释
     data = data.replace(mulCommentReg, (...args) => {
-      return args[0].replace(chinaReg, "");
+      return args[0].replace(chinaAndChinaSymbolsReg, "");
     });
 
     // 替换控制台输入表达式
     data = data.replace(matchConsoleReg, (...args) => {
-      return args[0].replace(chinaReg, "");
+      return args[0].replace(chinaAndChinaSymbolsReg, "");
     });
     const readable = Readable.from(data);
     // let fRead = fs.createReadStream(filePath);
@@ -113,7 +114,7 @@ const fileUtils = {
     // 自动import formMessage会增加一行
     if (!data.match(impFormatMessageReg)) {
       lineNum = 2;
-    };
+    }
     objReadline.on("line", function (line) {
       let srcLine = line;
 
@@ -133,14 +134,17 @@ const fileUtils = {
         return "";
       });
 
-      let regResult = line.match(chinaReg);
+      let regResult = line.match(chinaAndChinaSymbolsReg);
       if (regResult && regResult.length > 0) {
         regResult.map((item) => {
-          arr.push(item);
-          const positon = srcLine.indexOf(item);
-          matchFileLine.push(
-            `// ${relativePath} lineNum: ${lineNum} ${positon}`
-          );
+          // 纯中文符号不包含任何汉子的字符不生成国际化
+          if (item.match(chinaReg)) {
+            arr.push(item);
+            const positon = srcLine.indexOf(item);
+            matchFileLine.push(
+              `// ${relativePath} lineNum: ${lineNum} ${positon}`
+            );
+          }
         });
       }
 
@@ -254,7 +258,7 @@ const fileUtils = {
     let data = fs.readFileSync(filePath, "utf-8");
     if (!data.match(impFormatMessageReg)) {
       data = `import { formatMessage } from 'umi-plugin-react/locale';\n${data}`;
-    };
+    }
     // 替换单行注释
     data = data.replace(commentReg, (...args) => {
       const id = utils.guid();

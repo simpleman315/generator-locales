@@ -1,6 +1,11 @@
-// 中文汉子和符号正则
-export const chinaReg = /([\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+)/g;
+// 中文汉子正则
+export const chinaReg = /([\u4e00-\u9fa5]+)/g;
 
+// 中文汉子和符号正则
+export const chinaAndChinaSymbolsReg = /([\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+)/g;
+
+// 中文标点符号正则
+export const chinaSymbolsReg = /[丨\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5]+/g;
 // 增加自定义规则匹配，比如（表格.表单.国际化）
 export const matchCusChinaReg = /([\u4e00-\u9fa5]+[.]{1}[\u4e00-\u9fa5.]*[\u4e00-\u9fa5]+)/g;
 
@@ -28,4 +33,5 @@ export let slashReg = /[\/\\]/g;
 // 常用英文字符正则
 export const enSymbolsReg = /[@#()'",;?%&$~:*-]/g;
 
-export const impFormatMessageReg = /import(.*)umi-plugin-react\/locale/g;
+// 验证是否有导入国际化语句
+export const impFormatMessageReg = /(import(.*)formatMessage)|(import(.*)FormattedMessage)/g;
