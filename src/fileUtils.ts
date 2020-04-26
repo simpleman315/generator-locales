@@ -110,6 +110,10 @@ const fileUtils = {
     let matchFileLine: string[] = [];
     let formatMessageMatchFileLine: string[] = [];
     let lineNum = 1;
+    // 自动import formMessage会增加一行
+    if (!data.match(impFormatMessageReg)) {
+      lineNum = 2;
+    };
     objReadline.on("line", function (line) {
       let srcLine = line;
 
