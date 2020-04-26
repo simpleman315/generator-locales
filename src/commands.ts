@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 import generatorLocales from "./generatorLocales";
-export default function command(context: vscode.ExtensionContext) {
+export default function command(context: vscode.ExtensionContext,statusBarItem:vscode.StatusBarItem) {
   context.subscriptions.push(
     vscode.commands.registerCommand("generator.locales", (uri) => {
+      statusBarItem.show();
       vscode.window
         .showInputBox({
           // 调出输入框
@@ -10,7 +11,7 @@ export default function command(context: vscode.ExtensionContext) {
           placeHolder: "输入国际化模块名称前缀，不输入默认为当前目录名称",
         })
         .then(function (moduleName) {
-          generatorLocales.generatorLocalesByDir(uri.fsPath, moduleName);
+          generatorLocales.generatorLocalesByDir(uri.fsPath, moduleName,statusBarItem);
         });
     })
   );

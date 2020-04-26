@@ -6,7 +6,13 @@ import hoverProvider from "./hoverProvider";
  * @param {*} context
  */
 export function activate(context: vscode.ExtensionContext) {
-  commands(context);
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    1000
+  );
+  statusBarItem.command = "generator.locales";
+  statusBarItem.text = "正在生成国际化中...";
+  commands(context,statusBarItem);
   hoverProvider(context);
   jumpToDefinition(context);
 }

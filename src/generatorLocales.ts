@@ -26,7 +26,8 @@ function writeLocalesByData(
   allZhCNPositions: string[],
   allFormatMessages: string[],
   allFormatMessagePositions: string[],
-  isExistLocalesMap: Map<string, string>
+  isExistLocalesMap: Map<string, string>,
+  statusBarItem: vscode.StatusBarItem
 ) {
   let data = [];
   data.push("export default {");
@@ -91,6 +92,7 @@ function writeLocalesByData(
   data.push("};\n");
   fileUtils.writeFile(path.join(dir, "locales/zh-CN.ts"), data);
   vscode.window.showInformationMessage("国际化文件生成成功！");
+  statusBarItem.hide();
 }
 
 /**
@@ -139,7 +141,9 @@ async function translateBD(allZhCNs: string[]): Promise<any> {
     try {
       let itemObj: any = JSON.parse(item);
       let translateWords = itemObj.trans_result[0].dst;
-      resetTranslateAllZhCNs = resetTranslateAllZhCNs.concat(translateWords.split(CONSTANTS.transSplitSymbolEN));
+      resetTranslateAllZhCNs = resetTranslateAllZhCNs.concat(
+        translateWords.split(CONSTANTS.transSplitSymbolEN)
+      );
     } catch (error) {
       // 设置翻译失败的中文
       let failZhCNs = allZhCNs[index].split(CONSTANTS.transSplitSymbolEN);
@@ -174,7 +178,11 @@ const generatorLocales = {
    *
    * @param {*} dir 需要生成国际化的文件目录
    */
-  generatorLocalesByDir(dir: string, moduleName: any) {
+  generatorLocalesByDir(
+    dir: string,
+    moduleName: any,
+    statusBarItem: vscode.StatusBarItem
+  ) {
     let fileName = "";
     if (moduleName) {
       fileName = moduleName.toString();
@@ -191,6 +199,7 @@ const generatorLocales = {
     const files = fileUtils.getFilesByDir(dir);
     if (files.length === 0) {
       vscode.window.showInformationMessage("国际化文件生成成功！");
+      statusBarItem.hide();
       return;
     }
     let currIndex = 0;
@@ -233,7 +242,8 @@ const generatorLocales = {
             allZhCNPositions,
             allFormatMessages,
             allFormatMessagePositions,
-            isExistLocalesMap
+            isExistLocalesMap,
+            statusBarItem
           );
         }
       });
