@@ -17,6 +17,7 @@ import {
   matchConsoleReg,
   startPath,
   slashReg,
+  impFormatMessageReg,
 } from "./regExp";
 
 interface ZhCNObjs {
@@ -247,6 +248,9 @@ const fileUtils = {
     const filterMap = new Map();
     let { filePath, allZhCNs, transENByallZhCNs, keyName } = options;
     let data = fs.readFileSync(filePath, "utf-8");
+    if (!data.match(impFormatMessageReg)) {
+      data = `import { formatMessage } from 'umi-plugin-react/locale';\n${data}`;
+    };
     // 替换单行注释
     data = data.replace(commentReg, (...args) => {
       const id = utils.guid();

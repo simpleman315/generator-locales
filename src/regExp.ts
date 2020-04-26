@@ -27,3 +27,5 @@ export const startPath = /[\/\\][^\/\\]*/;
 export let slashReg = /[\/\\]/g;
 // 常用英文字符正则
 export const enSymbolsReg = /[@#()'",;?%&$~:*-]/g;
+
+export const impFormatMessageReg = /import(.*)umi-plugin-react\/locale/g;
