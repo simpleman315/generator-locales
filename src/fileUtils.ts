@@ -4,7 +4,6 @@ import * as path from "path";
 import { Readable } from "stream";
 const join = path.join;
 import * as readline from "readline";
-import CONSTANTS from "./constants";
 import utils from "./utils";
 import {
   chinaReg,
@@ -209,15 +208,7 @@ const fileUtils = {
   writeFile(filePath: string, data: string[]) {
     fs.writeFileSync(filePath, data.join("\n"));
   },
-  /**
-   * 将文件中的中文替换成国际化标签
-   * @param filePath 文件路径
-   * @param genKey 国际化key
-   */
-  replaceZhbyGenkey(filePath: string, zhCN: string, genKey: string) {
-    console.error(filePath);
-    console.error(genKey);
-  },
+
   /**
    *
    * @param includesZhCNFiles 包含中文的文件
