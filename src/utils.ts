@@ -125,7 +125,7 @@ const utils = {
       let longStr: string = "";
       processAllZhCNs.map((item, index) => {
         // 将表单.按钮 页面定制化的转成!号
-        item = item.replace('.','!');
+        item = item.replace(/\./g,'!');
         // 处理长中文，截取/后面的中文不做翻译
         if (item.indexOf("/") !== -1) {
           item = item.substring(0, item.indexOf("/"));
