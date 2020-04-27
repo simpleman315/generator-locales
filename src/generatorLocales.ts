@@ -7,7 +7,6 @@ import utils from "./utils";
 import { enSymbolsReg } from "./regExp";
 import CONSTANTS from "./constants";
 const localesIndent = "    ";
-// 常用英文字符正则
 
 /**
  *
