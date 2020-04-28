@@ -1,7 +1,7 @@
 {
   "name": "vv-generator-locales",
   "displayName": "vv-generator-locales",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "publisher": "simpleman315",
   "description": "vv-generator-locales",
   "author": {
@@ -31,7 +31,6 @@
     "test": "node ./out/test/runTest.js"
   },
   "contributes": {
-   
     "commands": [
       {
         "command": "generator.locales",
