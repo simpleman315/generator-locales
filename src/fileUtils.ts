@@ -418,6 +418,17 @@ const fileUtils = {
     return result;
   },
   /**
+   * 获取当前工作空间目录
+   */
+  getWorkRootDir() {
+    let workRoot = "";
+    const workspaceFolder = vscode.workspace.workspaceFolders;
+    if (workspaceFolder && workspaceFolder.length > 0) {
+      workRoot = workspaceFolder[0].uri.fsPath;
+    }
+    return workRoot;
+  },
+  /**
    * 获取当前工作空间目录，由于vscode开启了多目录模式，需要通过当前路径和工作空间文件数组来比对匹配
    * @param currFilePath 当前路径
    */
@@ -459,6 +470,43 @@ const fileUtils = {
       });
     }
     return relativePath;
+  },
+  /**
+   * 写入snippets
+   * @param {*} workspace
+   */
+  createSnippetsFile(workspace: string) {
+    try {
+      const existsSnippets = fs.existsSync(
+        path.join(workspace, "snippets/int.json")
+      );
+      if (existsSnippets) {
+        let data = fs.readFileSync(
+          path.join(workspace, "snippets/int.json"),
+          "UTF-8"
+        );
+        const exists = fs.existsSync(path.join(workspace, ".vscode"));
+        if (!exists) {
+          fs.mkdirSync(path.join(workspace, ".vscode"));
+          fs.writeFileSync(
+            path.join(workspace, ".vscode/int.code-snippets"),
+            data
+          );
+        } else {
+          const fileExists = fs.existsSync(
+            path.join(workspace, ".vscode/int.code-snippets")
+          );
+          if (!fileExists) {
+            fs.writeFileSync(
+              path.join(workspace, ".vscode/int.code-snippets"),
+              data
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
 
