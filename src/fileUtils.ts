@@ -471,32 +471,30 @@ const fileUtils = {
     }
     return relativePath;
   },
+
   /**
    * 写入snippets
    * @param {*} workspace
    */
   createSnippetsFile(workspace: string) {
     try {
-      const existsSnippets = fs.existsSync(
-        path.join(workspace, "snippets/int.json")
-      );
+      const existsSnippets = fs.existsSync(path.join(workspace, "snippets"));
       if (existsSnippets) {
-        let data = fs.readFileSync(
-          path.join(workspace, "snippets/int.json"),
-          "UTF-8"
-        );
-        const exists = fs.existsSync(path.join(workspace, ".vscode"));
-        if (!exists) {
-          fs.mkdirSync(path.join(workspace, ".vscode"));
-          fs.writeFileSync(
-            path.join(workspace, ".vscode/int.code-snippets"),
-            data
-          );
-        } else {
-          fs.writeFileSync(
-            path.join(workspace, ".vscode/int.code-snippets"),
-            data
-          );
+        let files = fs.readdirSync(path.join(workspace, "snippets"));
+        if (files && files.length > 0) {
+          const exists = fs.existsSync(path.join(workspace, ".vscode"));
+          if (!exists) {
+            fs.mkdirSync(path.join(workspace, ".vscode"));
+          }
+          files.map((item) => {
+            let fPath = join(path.join(workspace, "snippets"), item);
+            let data = fs.readFileSync(fPath, "UTF-8");
+            let fileName = item.split(".")[0];
+            fs.writeFileSync(
+              path.join(workspace, `.vscode/${fileName}.code-snippets`),
+              data
+            );
+          });
         }
       }
     } catch (error) {
