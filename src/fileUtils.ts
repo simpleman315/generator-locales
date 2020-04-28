@@ -485,6 +485,15 @@ const fileUtils = {
           const exists = fs.existsSync(path.join(workspace, ".vscode"));
           if (!exists) {
             fs.mkdirSync(path.join(workspace, ".vscode"));
+          } else {
+            // 删除.vscode snippets文件
+            let oriFiles = fs.readdirSync(path.join(workspace, ".vscode"));
+            oriFiles.map((item) => {
+              if (item.indexOf("code-snippets") !== -1) {
+                let fPath = join(path.join(workspace, ".vscode"), item);
+                fs.unlinkSync(fPath);
+              }
+            });
           }
           files.map((item) => {
             let fPath = join(path.join(workspace, "snippets"), item);
