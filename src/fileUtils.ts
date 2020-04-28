@@ -510,6 +510,24 @@ const fileUtils = {
       console.error(error);
     }
   },
+  /**
+   * 监听snippets改变并重新写入
+   * @param {*} workspace
+   */
+  watchSnippetsFileAndUpdate(workspace: string, currPath: string) {
+    try {
+      let data = fs.readFileSync(currPath, "UTF-8");
+      let findIndex = currPath.lastIndexOf(path.sep);
+      let fileName = currPath.substring(findIndex + 1);
+      fileName = fileName.split(".")[0];
+      fs.writeFileSync(
+        path.join(workspace, `.vscode/${fileName}.code-snippets`),
+        data
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 export default fileUtils;
