@@ -493,15 +493,10 @@ const fileUtils = {
             data
           );
         } else {
-          const fileExists = fs.existsSync(
-            path.join(workspace, ".vscode/int.code-snippets")
+          fs.writeFileSync(
+            path.join(workspace, ".vscode/int.code-snippets"),
+            data
           );
-          if (!fileExists) {
-            fs.writeFileSync(
-              path.join(workspace, ".vscode/int.code-snippets"),
-              data
-            );
-          }
         }
       }
     } catch (error) {
