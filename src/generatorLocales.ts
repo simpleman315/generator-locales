@@ -74,11 +74,16 @@ function writeLocalesByData(
   if (allFormatMessages && allFormatMessages.length > 0) {
     let noRepeatAllFormatMessages = [...new Set(allFormatMessages)];
     noRepeatAllFormatMessages.map((item) => {
-      let allIndex = utils.findAllIndex(allFormatMessages, item);
-      allIndex.map((indexItem: any) => {
-        data.push(`${localesIndent}${allFormatMessagePositions[indexItem]}`);
-      });
-      data.push(`${localesIndent}'${item}': '${isExistLocalesMap.get(item)}',`);
+      // 过滤页面中引入全局文件国家化资源的标签
+      if (isExistLocalesMap.get(item)) {
+        let allIndex = utils.findAllIndex(allFormatMessages, item);
+        allIndex.map((indexItem: any) => {
+          data.push(`${localesIndent}${allFormatMessagePositions[indexItem]}`);
+        });
+        data.push(
+          `${localesIndent}'${item}': '${isExistLocalesMap.get(item)}',`
+        );
+      }
     });
   }
   // 去除最后一行逗号
