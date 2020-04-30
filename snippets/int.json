@@ -1,9 +1,0 @@
-{
-    "i.add": {
-      "prefix": "iadd",
-      "body": [
-        "新增"
-      ],
-      "description": "新增"
-    }
-}

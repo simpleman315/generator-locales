@@ -471,63 +471,6 @@ const fileUtils = {
     }
     return relativePath;
   },
-
-  /**
-   * 写入snippets
-   * @param {*} workspace
-   */
-  createSnippetsFile(workspace: string) {
-    try {
-      const existsSnippets = fs.existsSync(path.join(workspace, "snippets"));
-      if (existsSnippets) {
-        let files = fs.readdirSync(path.join(workspace, "snippets"));
-        if (files && files.length > 0) {
-          const exists = fs.existsSync(path.join(workspace, ".vscode"));
-          if (!exists) {
-            fs.mkdirSync(path.join(workspace, ".vscode"));
-          } else {
-            // 删除.vscode snippets文件
-            let oriFiles = fs.readdirSync(path.join(workspace, ".vscode"));
-            oriFiles.map((item) => {
-              if (item.indexOf("code-snippets") !== -1) {
-                let fPath = join(path.join(workspace, ".vscode"), item);
-                fs.unlinkSync(fPath);
-              }
-            });
-          }
-          files.map((item) => {
-            let fPath = join(path.join(workspace, "snippets"), item);
-            let data = fs.readFileSync(fPath, "UTF-8");
-            let fileName = item.split(".")[0];
-            fs.writeFileSync(
-              path.join(workspace, `.vscode/${fileName}.code-snippets`),
-              data
-            );
-          });
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  },
-  /**
-   * 监听snippets改变并重新写入
-   * @param {*} workspace
-   */
-  watchSnippetsFileAndUpdate(workspace: string, currPath: string) {
-    try {
-      let data = fs.readFileSync(currPath, "UTF-8");
-      let findIndex = currPath.lastIndexOf(path.sep);
-      let fileName = currPath.substring(findIndex + 1);
-      fileName = fileName.split(".")[0];
-      fs.writeFileSync(
-        path.join(workspace, `.vscode/${fileName}.code-snippets`),
-        data
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  },
 };
 
 export default fileUtils;
