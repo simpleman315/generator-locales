@@ -378,6 +378,7 @@ const fileUtils = {
     let data = fs.readFileSync(path.join(dir, "locales/zh-CN.ts"), "utf-8");
     const datas = data.split("\n");
     datas.map((item: string) => {
+      console.error(item.match(commentReg));
       if (
         item.indexOf("export default") === -1 &&
         !item.match(commentReg) &&

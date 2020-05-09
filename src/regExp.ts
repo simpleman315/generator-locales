@@ -17,7 +17,7 @@ export const formatMessageReg = /formatMessage\(\{[\s]*id:\s*['|"]([1-9a-zA-Z.%]
 export const formatMessageRegCap = /FormattedMessage[\s]*id=\s*['|"]([1-9a-zA-Z.%]*)['|"][\s\S]*>/g;
 
 // 单行注释正则
-export const commentReg = /(\/\/[^\n\r]*[\n\r]+)/g;
+export const commentReg = /(\/\/[^\n\r]*[\n\r]*)/g;
 
 // 多行注释
 export const mulCommentReg = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)/g;
